@@ -1,6 +1,6 @@
 ﻿namespace BlissShop.Common.Configs;
 
-public class JwtConfig
+public class JwtConfig : ConfigBase
 {
     public string Secret { get; set; } = string.Empty;
     public TimeSpan AccessTokenLifeTime { get; set; }

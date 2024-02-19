@@ -23,6 +23,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\BlissShop.BLL\BlissShop.BLL.csproj" />
+    <ProjectReference Include="..\BlissShop.Common\BlissShop.Common.csproj" />
     <ProjectReference Include="..\BlissShop.Seeding\BlissShop.Seeding.csproj" />
   </ItemGroup>
 

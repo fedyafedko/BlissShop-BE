@@ -15,8 +15,13 @@ using System.Text;
 using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
+using BlissShop.Common.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Configs
+builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
+       .AddConfig<JwtConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
 
