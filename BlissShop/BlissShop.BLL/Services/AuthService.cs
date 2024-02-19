@@ -2,6 +2,7 @@
 using BlissShop.Abstraction;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
+using BlissShop.Common.Extentions;
 using BlissShop.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
@@ -39,14 +40,20 @@ public class AuthService : IAuthService
         var result = await _userManager.CreateAsync(user, dto.Password);
 
         if (!result.Succeeded)
+        {
+            _logger.LogIdentityErrors(user, result);
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+        }
 
         var role = dto.Role;
 
         var roleResult = await _userManager.AddToRoleAsync(user, role);
 
         if (!roleResult.Succeeded)
+        {
+            _logger.LogError($"Failed to add user to role. Role: {role}");
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
+        }
 
         return await GetAuthTokensAsync(user);
     }
