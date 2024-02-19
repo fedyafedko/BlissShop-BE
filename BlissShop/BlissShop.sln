@@ -5,13 +5,17 @@ VisualStudioVersion = 17.8.34511.84
 MinimumVisualStudioVersion = 10.0.40219.1
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlissShop", "BlissShop\BlissShop.csproj", "{521485D9-9596-4521-A255-17E56FBE9057}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlissShop.DAL", "BlissShop.DAL\BlissShop.DAL.csproj", "{1FF80E4E-1A31-4811-A6CD-4F13285DDFAE}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlissShop.DAL", "BlissShop.DAL\BlissShop.DAL.csproj", "{1FF80E4E-1A31-4811-A6CD-4F13285DDFAE}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlissShop.Entities", "BlissShop.Entities\BlissShop.Entities.csproj", "{B3555C19-8ADA-486A-A83F-3BA0C60F0071}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlissShop.Entities", "BlissShop.Entities\BlissShop.Entities.csproj", "{B3555C19-8ADA-486A-A83F-3BA0C60F0071}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlissShop.BLL", "BlissShop.BLL\BlissShop.BLL.csproj", "{F7BF9377-B8B5-42E9-A799-C1EC13478750}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlissShop.BLL", "BlissShop.BLL\BlissShop.BLL.csproj", "{F7BF9377-B8B5-42E9-A799-C1EC13478750}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlissShop.Common", "BlissShop.Common\BlissShop.Common.csproj", "{4A63F144-32B8-46EE-B40A-8472255ABE48}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlissShop.Common", "BlissShop.Common\BlissShop.Common.csproj", "{4A63F144-32B8-46EE-B40A-8472255ABE48}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlissShop.Abstraction", "BlissShop.Abstraction\BlissShop.Abstraction.csproj", "{7854E84B-A78A-4A82-A25C-4E1DF69E42D0}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlissShop.Seeding", "BlissShop.Seeding\BlissShop.Seeding.csproj", "{7A385A85-74C6-4A4A-8604-7E2EE252A7AC}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -39,6 +43,14 @@ Global
 		{4A63F144-32B8-46EE-B40A-8472255ABE48}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{4A63F144-32B8-46EE-B40A-8472255ABE48}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{4A63F144-32B8-46EE-B40A-8472255ABE48}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7854E84B-A78A-4A82-A25C-4E1DF69E42D0}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7854E84B-A78A-4A82-A25C-4E1DF69E42D0}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7854E84B-A78A-4A82-A25C-4E1DF69E42D0}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7854E84B-A78A-4A82-A25C-4E1DF69E42D0}.Release|Any CPU.Build.0 = Release|Any CPU
+		{7A385A85-74C6-4A4A-8604-7E2EE252A7AC}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7A385A85-74C6-4A4A-8604-7E2EE252A7AC}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{7A385A85-74C6-4A4A-8604-7E2EE252A7AC}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{7A385A85-74C6-4A4A-8604-7E2EE252A7AC}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
