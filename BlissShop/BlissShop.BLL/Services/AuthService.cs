@@ -73,12 +73,15 @@ public class AuthService : IAuthService
     public async Task<AuthSuccessDTO> SignInAsync(SignInDTO dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email)
-            ?? throw new Exception($"Unable to find user by specified email. Email: {dto.Email}");
+            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {dto.Email}");
+
+        if (!user.EmailConfirmed)
+            throw new ConfirmedEmailException("Email is not confirmed");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
 
         if (!isPasswordValid)
-            throw new Exception($"User input incorrect password. Password: {dto.Password}");
+            throw new IncorrectParametersException($"User input incorrect password. Password: {dto.Password}");
 
         return await _tokenService.GetAuthTokensAsync(user);
     }
