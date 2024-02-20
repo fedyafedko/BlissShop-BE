@@ -4,7 +4,7 @@ using Microsoft.Extensions.Logging;
 
 namespace BlissShop.Common.Extentions;
 
-public static class LoggerExtensions
+public static class LoggerExtension
 {
     public static void LogIdentityErrors<T>(this ILogger<T> logger, User user, IdentityResult result)
     {

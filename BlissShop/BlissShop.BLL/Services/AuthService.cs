@@ -1,9 +1,11 @@
 ﻿using AutoMapper;
 using BlissShop.Abstraction;
+using BlissShop.Abstraction.FluentEmail;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
 using BlissShop.Common.Extentions;
 using BlissShop.Entities;
+using BlissShop.FluentEmail.MessageBase;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
@@ -12,7 +14,9 @@ namespace BlissShop.BLL.Services;
 public class AuthService : IAuthService
 {
     public readonly UserManager<User> _userManager;
+    public readonly IEmailConfirmationService _emailConfirmationService;
     public readonly ITokenService _tokenService;
+    private readonly IEmailService _emailService;
     public readonly ILogger<AuthService> _logger;
     public readonly IMapper _mapper;
 
@@ -20,14 +24,18 @@ public class AuthService : IAuthService
         UserManager<User> userManager,
         ITokenService tokenService,
         ILogger<AuthService> logger,
-        IMapper mapper)
+        IMapper mapper,
+        IEmailConfirmationService emailConfirmationService,
+        IEmailService emailService)
     {
         _userManager = userManager;
         _tokenService = tokenService;
         _logger = logger;
         _mapper = mapper;
+        _emailConfirmationService = emailConfirmationService;
+        _emailService = emailService;
     }
-    public async Task<AuthSuccessDTO> SignUpAsync(SignUpDTO dto)
+    public async Task<RegisterResponseDTO> SignUpAsync(SignUpDTO dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
 
@@ -55,28 +63,26 @@ public class AuthService : IAuthService
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
         }
 
-        return await GetAuthTokensAsync(user);
+        var generatedCode = await _emailConfirmationService.GenerateEmailCodeAsync(user.Id);
+
+        await _emailService.SendAsync(user.Email!, new ConfirmedEmailMessage{ Code = generatedCode });
+
+        return new RegisterResponseDTO { UserId = user.Id};
     }
 
     public async Task<AuthSuccessDTO> SignInAsync(SignInDTO dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email)
-            ?? throw new Exception($"Unable to find user by specified email. Email: {dto.Email}");
+            ?? throw new NotFoundException($"Unable to find user by specified email. Email: {dto.Email}");
+
+        if (!user.EmailConfirmed)
+            throw new ConfirmedEmailException("Email is not confirmed");
 
         var isPasswordValid = await _userManager.CheckPasswordAsync(user, dto.Password);
 
         if (!isPasswordValid)
-            throw new Exception($"User input incorrect password. Password: {dto.Password}");
+            throw new IncorrectParametersException($"User input incorrect password. Password: {dto.Password}");
 
-        return await GetAuthTokensAsync(user);
-    }
-
-
-    protected async Task<AuthSuccessDTO> GetAuthTokensAsync(User user)
-    {
-        return new AuthSuccessDTO
-        {
-            AccessToken = await _tokenService.GenerateAccessTokenAsync(user),
-        };
+        return await _tokenService.GetAuthTokensAsync(user);
     }
 }
