@@ -16,12 +16,16 @@ using Microsoft.AspNetCore.Authentication.JwtBearer;
 using Microsoft.OpenApi.Any;
 using Microsoft.OpenApi.Models;
 using BlissShop.Common.Extentions;
+using BlissShop.FluentEmail.Services;
+using BlissShop.Abstraction.FluentEmail;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Configs
 builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
-       .AddConfig<JwtConfig>());
+       .AddConfig<JwtConfig>()
+       .AddConfig<EmailConfig>()
+       .AddConfig<AuthConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
 
@@ -39,12 +43,17 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 //Services
 builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<IEmailConfirmationService, EmailConfirmationService>();
+builder.Services.AddScoped<IEmailService, EmailService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
+
+// Fluent Email
+builder.Services.FluentEmail(builder.Configuration);
 
 // Seeding
 builder.Services.AddSeeding();

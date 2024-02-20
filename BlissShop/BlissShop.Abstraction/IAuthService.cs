@@ -6,6 +6,6 @@ namespace BlissShop.Abstraction;
 
 public interface IAuthService
 {
-    Task<AuthSuccessDTO> SignUpAsync(SignUpDTO dto);
+    Task<RegisterResponseDTO> SignUpAsync(SignUpDTO dto);
     Task<AuthSuccessDTO> SignInAsync(SignInDTO dto);
 }

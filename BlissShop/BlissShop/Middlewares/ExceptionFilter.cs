@@ -15,6 +15,7 @@ public class ExceptionFilter : IExceptionFilter
             NotFoundException => new NotFoundObjectResult(context.Exception.Message),
             InvalidCredentialsException => new UnauthorizedObjectResult(context.Exception.Message),
             ExpiredException => new BadRequestObjectResult(context.Exception.Message),
+            IncorrectParametersException => new BadRequestObjectResult(context.Exception.Message),
             AlreadyExistsException => new BadRequestObjectResult(context.Exception.Message),
             InvalidTokenException => new BadRequestObjectResult(context.Exception.Message),
             _ => new ObjectResult(new { error = $"An unexpected error occurred: {context.Exception.Message}" })

@@ -1,5 +1,6 @@
 ﻿using BlissShop.Abstraction;
 using BlissShop.Common.Configs;
+using BlissShop.Common.DTO.Auth;
 using BlissShop.Entities;
 using LanguageExt;
 using Microsoft.AspNetCore.Identity;
@@ -52,5 +53,13 @@ public class TokenService : ITokenService
         var token = jwtTokenHandler.CreateToken(tokenDescriptor);
         var jwtToken = jwtTokenHandler.WriteToken(token);
         return jwtToken;
+    }
+
+    public async Task<AuthSuccessDTO> GetAuthTokensAsync(User user)
+    {
+        return new AuthSuccessDTO
+        {
+            AccessToken = await GenerateAccessTokenAsync(user),
+        };
     }
 }

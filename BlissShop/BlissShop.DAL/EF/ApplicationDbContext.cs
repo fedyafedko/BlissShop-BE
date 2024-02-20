@@ -11,6 +11,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<Order> Orders { get; set; } = null!;
     public DbSet<Product> Products { get; set; } = null!;
     public DbSet<Shop> Shops { get; set; } = null!;
+    public DbSet<UserRegister> UserRegisters { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 
