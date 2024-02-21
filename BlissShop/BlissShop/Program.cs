@@ -45,6 +45,7 @@ builder.Services.AddScoped<IAuthService, AuthService>();
 builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailConfirmationService, EmailConfirmationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
+builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()

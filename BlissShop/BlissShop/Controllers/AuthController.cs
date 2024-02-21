@@ -1,5 +1,8 @@
 using BlissShop.Abstraction;
+using BlissShop.BLL.Services;
+using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Auth;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlissShop.Controllers
@@ -10,11 +13,13 @@ namespace BlissShop.Controllers
     {
         private readonly IAuthService _authService;
         private readonly IEmailConfirmationService _emailConfirmationService;
+        private readonly IRefreshTokenService _refreshTokenService;
 
-        public AuthController(IAuthService authService, IEmailConfirmationService emailConfirmationService)
+        public AuthController(IAuthService authService, IEmailConfirmationService emailConfirmationService, IRefreshTokenService refreshTokenService)
         {
             _authService = authService;
             _emailConfirmationService = emailConfirmationService;
+            _refreshTokenService = refreshTokenService;
         }
 
         [HttpPost("[action]")]
@@ -31,10 +36,17 @@ namespace BlissShop.Controllers
             return Ok(result);
         }
 
-        [HttpPost("confirm-email")]
+        [HttpPost("[action]")]
         public async Task<IActionResult> ConfirmEmail(ConfirmEmailDTO dto)
         { 
             var result = await _emailConfirmationService.ConfirmEmailAsync(dto);
+            return Ok(result);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> RefreshToken(RefreshTokenDTO dto)
+        {
+            var result = await _refreshTokenService.RefreshTokenAsync(dto);
             return Ok(result);
         }
     }
