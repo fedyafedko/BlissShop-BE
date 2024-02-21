@@ -1,7 +1,7 @@
 ﻿using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Auth;
 
-namespace BlissShop.Abstraction;
+namespace BlissShop.Abstraction.Auth;
 
 public interface IRefreshTokenService
 {

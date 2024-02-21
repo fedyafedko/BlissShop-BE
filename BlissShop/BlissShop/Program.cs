@@ -7,8 +7,6 @@ using Microsoft.AspNetCore.Identity;
 using BlissShop.Common.Configs;
 using BlissShop.Middlewares;
 using BlissShop.Seeding.Extentions;
-using BlissShop.Abstraction;
-using BlissShop.BLL.Services;
 using BlissShop.BLL.Profiles;
 using Microsoft.IdentityModel.Tokens;
 using System.Text;
@@ -18,6 +16,8 @@ using Microsoft.OpenApi.Models;
 using BlissShop.Common.Extentions;
 using BlissShop.FluentEmail.Services;
 using BlissShop.Abstraction.FluentEmail;
+using BlissShop.Abstraction.Auth;
+using BlissShop.BLL.Services.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -25,6 +25,7 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<JwtConfig>()
        .AddConfig<EmailConfig>()
+       .AddConfig<GoogleAuthConfig>()
        .AddConfig<AuthConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
@@ -46,6 +47,7 @@ builder.Services.AddScoped<ITokenService, TokenService>();
 builder.Services.AddScoped<IEmailConfirmationService, EmailConfirmationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
+builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()

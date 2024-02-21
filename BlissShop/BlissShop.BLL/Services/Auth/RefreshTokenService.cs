@@ -1,4 +1,4 @@
-﻿using BlissShop.Abstraction;
+﻿using BlissShop.Abstraction.Auth;
 using BlissShop.Common.Configs;
 using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Auth;
@@ -10,7 +10,7 @@ using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 
-namespace BlissShop.BLL.Services;
+namespace BlissShop.BLL.Services.Auth;
 
 public class RefreshTokenService : IRefreshTokenService
 {

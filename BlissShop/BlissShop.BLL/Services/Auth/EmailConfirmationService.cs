@@ -1,5 +1,4 @@
-﻿using BlissShop.Abstraction;
-using BlissShop.Common.Extensions;
+﻿using BlissShop.Common.Extensions;
 using BlissShop.Common.Configs;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
@@ -7,8 +6,9 @@ using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
+using BlissShop.Abstraction.Auth;
 
-namespace BlissShop.BLL.Services;
+namespace BlissShop.BLL.Services.Auth;
 
 public class EmailConfirmationService : IEmailConfirmationService
 {
@@ -40,7 +40,7 @@ public class EmailConfirmationService : IEmailConfirmationService
 
         var option = await CanConfirmEmailAsync(dto.UserId, dto.Code);
 
-        if(option)
+        if (option)
         {
             user.EmailConfirmed = true;
             await _userManager.UpdateAsync(user);
