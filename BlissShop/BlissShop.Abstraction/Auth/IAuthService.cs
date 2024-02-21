@@ -2,7 +2,7 @@
 using BlissShop.Common.DTO.Auth;
 using LanguageExt;
 
-namespace BlissShop.Abstraction;
+namespace BlissShop.Abstraction.Auth;
 
 public interface IAuthService
 {

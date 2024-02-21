@@ -2,7 +2,7 @@
 using BlissShop.Entities;
 using LanguageExt;
 
-namespace BlissShop.Abstraction;
+namespace BlissShop.Abstraction.Auth;
 
 public interface ITokenService
 {

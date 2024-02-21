@@ -1,5 +1,5 @@
 ﻿using AutoMapper;
-using BlissShop.Abstraction;
+using BlissShop.Abstraction.Auth;
 using BlissShop.Abstraction.FluentEmail;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
@@ -9,7 +9,7 @@ using BlissShop.FluentEmail.MessageBase;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
 
-namespace BlissShop.BLL.Services;
+namespace BlissShop.BLL.Services.Auth;
 
 public class AuthService : IAuthService
 {
@@ -65,9 +65,9 @@ public class AuthService : IAuthService
 
         var generatedCode = await _emailConfirmationService.GenerateEmailCodeAsync(user.Id);
 
-        await _emailService.SendAsync(user.Email!, new ConfirmedEmailMessage{ Code = generatedCode });
+        await _emailService.SendAsync(user.Email!, new ConfirmedEmailMessage { Code = generatedCode });
 
-        return new RegisterResponseDTO { UserId = user.Id};
+        return new RegisterResponseDTO { UserId = user.Id };
     }
 
     public async Task<AuthSuccessDTO> SignInAsync(SignInDTO dto)

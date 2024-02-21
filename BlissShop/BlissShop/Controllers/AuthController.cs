@@ -1,4 +1,4 @@
-using BlissShop.Abstraction;
+using BlissShop.Abstraction.Auth;
 using BlissShop.BLL.Services;
 using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Auth;

@@ -1,4 +1,4 @@
-﻿using BlissShop.Abstraction;
+﻿using BlissShop.Abstraction.Auth;
 using BlissShop.Common.Configs;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
@@ -13,7 +13,7 @@ using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text;
 
-namespace BlissShop.BLL.Services;
+namespace BlissShop.BLL.Services.Auth;
 
 public class TokenService : ITokenService
 {
