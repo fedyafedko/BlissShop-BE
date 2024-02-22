@@ -20,6 +20,9 @@ using BlissShop.Abstraction.Auth;
 using BlissShop.BLL.Services.Auth;
 using BlissShop.Utility;
 using Microsoft.AspNetCore.Mvc.ApplicationModels;
+using BlissShop.Abstraction.Users;
+using BlissShop.BLL.Services.Users;
+using Microsoft.Extensions.FileProviders;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -29,6 +32,7 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<EmailConfig>()
        .AddConfig<GoogleAuthConfig>()
        .AddConfig<CallbackUrisConfig>()
+       .AddConfig<AvatarConfig>()
        .AddConfig<AuthConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
@@ -54,6 +58,7 @@ builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
+builder.Services.AddScoped<IUserService, UserService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
@@ -141,6 +146,12 @@ if (app.Environment.IsDevelopment())
     app.UseSwagger();
     app.UseSwaggerUI();
 }
+
+app.UseStaticFiles(new StaticFileOptions
+{
+    FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
+    RequestPath = "/Uploads"
+});
 
 app.UseHttpsRedirection();
 app.UseCors(
