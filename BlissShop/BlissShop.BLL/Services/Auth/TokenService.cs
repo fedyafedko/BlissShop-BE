@@ -2,6 +2,7 @@
 using BlissShop.Common.Configs;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
+using BlissShop.Common.Extentions;
 using BlissShop.Entities;
 using LanguageExt;
 using Microsoft.AspNetCore.Identity;
@@ -20,7 +21,6 @@ public class TokenService : ITokenService
     private readonly JwtConfig _jwtConfig;
     private readonly UserManager<User> _userManager;
     private readonly ILogger<AuthService> _logger;
-
 
     public TokenService(
         IOptions<JwtConfig> jwtConfig,
@@ -70,7 +70,10 @@ public class TokenService : ITokenService
         user.RefreshTokenExpiresAt = DateTimeOffset.UtcNow.Add(_jwtConfig.RefreshTokenLifeTime);
         var userUpdated = await _userManager.UpdateAsync(user);
         if (!userUpdated.Succeeded)
+        {
+            _logger.LogIdentityErrors(user, userUpdated);
             throw new UserManagerException("Exeption with updating user", userUpdated.Errors);
+        }
 
         return user.RefreshToken;
     }
