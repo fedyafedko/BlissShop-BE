@@ -18,6 +18,8 @@ using BlissShop.FluentEmail.Services;
 using BlissShop.Abstraction.FluentEmail;
 using BlissShop.Abstraction.Auth;
 using BlissShop.BLL.Services.Auth;
+using BlissShop.Utility;
+using Microsoft.AspNetCore.Mvc.ApplicationModels;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -32,8 +34,10 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
 builder.Services.AddAutoMapper(typeof(AuthProfile));
 
 builder.Services.AddControllers(cfg => cfg.Filters.Add(typeof(ExceptionFilter)));
+builder.Services.AddControllers(options => options
+    .Conventions
+    .Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())));
 
-builder.Services.Configure<JwtConfig>(builder.Configuration.GetSection("JwtConfig"));
 
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
