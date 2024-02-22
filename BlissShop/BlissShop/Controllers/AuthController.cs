@@ -1,15 +1,13 @@
 using BlissShop.Abstraction.Auth;
-using BlissShop.BLL.Services;
 using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Requests;
-using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlissShop.Controllers
 {
     [ApiController]
-    [Route("[controller]")]
+    [Route("api/[controller]")]
     public class AuthController : ControllerBase
     {
         private readonly IAuthService _authService;
