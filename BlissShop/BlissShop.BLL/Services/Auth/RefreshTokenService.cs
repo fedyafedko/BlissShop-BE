@@ -1,10 +1,8 @@
 ﻿using BlissShop.Abstraction.Auth;
-using BlissShop.Common.Configs;
 using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
 using BlissShop.Entities;
-using LanguageExt;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.IdentityModel.Tokens;
 using System.IdentityModel.Tokens.Jwt;

@@ -26,6 +26,7 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<JwtConfig>()
        .AddConfig<EmailConfig>()
        .AddConfig<GoogleAuthConfig>()
+       .AddConfig<CallbackUrisConfig>()
        .AddConfig<AuthConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
@@ -48,6 +49,7 @@ builder.Services.AddScoped<IEmailConfirmationService, EmailConfirmationService>(
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
+builder.Services.AddScoped<IPasswordService, PasswordService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
