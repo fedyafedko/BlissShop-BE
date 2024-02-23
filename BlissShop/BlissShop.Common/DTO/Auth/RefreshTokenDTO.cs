@@ -1,4 +1,4 @@
-﻿namespace BlissShop.Common.DTO;
+﻿namespace BlissShop.Common.DTO.Auth;
 
 public class RefreshTokenDTO
 {

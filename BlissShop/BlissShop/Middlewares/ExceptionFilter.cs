@@ -18,6 +18,7 @@ public class ExceptionFilter : IExceptionFilter
             IncorrectParametersException => new BadRequestObjectResult(context.Exception.Message),
             AlreadyExistsException => new BadRequestObjectResult(context.Exception.Message),
             ConfirmedEmailException => new BadRequestObjectResult(context.Exception.Message),
+            RestrictedAccessException => new BadRequestObjectResult(context.Exception.Message),
             InvalidTokenException => new BadRequestObjectResult(context.Exception.Message),
             FluentValidation.ValidationException => new BadRequestObjectResult(context.Exception.Message),
             InvalidSecurityAlgorithmException => new BadRequestObjectResult(context.Exception.Message),

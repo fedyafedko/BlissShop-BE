@@ -26,6 +26,8 @@ using Microsoft.Extensions.FileProviders;
 using FluentValidation;
 using FluentValidation.AspNetCore;
 using BlissShop.Validation.Auth;
+using BlissShop.BLL.Services;
+using BlissShop.Abstraction.Shop;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -62,6 +64,7 @@ builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
 builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IUserService, UserService>();
+builder.Services.AddScoped<IShopService, ShopService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
