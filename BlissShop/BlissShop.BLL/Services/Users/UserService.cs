@@ -1,21 +1,39 @@
-﻿using BlissShop.Abstraction.Users;
+﻿using AutoMapper;
+using BlissShop.Abstraction.Users;
 using BlissShop.Common.Configs;
+using BlissShop.Common.DTO.User;
 using BlissShop.Common.Exceptions;
+using BlissShop.Common.Extentions;
+using BlissShop.Common.Requests;
 using BlissShop.Common.Responses;
+using BlissShop.Entities;
+using Google.Apis.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
+using Microsoft.Extensions.Logging;
 
 namespace BlissShop.BLL.Services.Users;
 
 public class UserService : IUserService
 {
     private readonly AvatarConfig _avatarConfig;
+    private readonly UserManager<User> _userManager;
     private readonly IWebHostEnvironment _env;
+    private readonly ILogger<UserService> _logger;
+    private readonly IMapper _mapper;
 
-    public UserService(AvatarConfig avatarConfig, IWebHostEnvironment env)
+    public UserService(AvatarConfig avatarConfig,
+        UserManager<User> userManager,
+        IWebHostEnvironment env,
+        IMapper mapper,
+        ILogger<UserService> logger)
     {
         _avatarConfig = avatarConfig;
+        _userManager = userManager;
         _env = env;
+        _mapper = mapper;
+        _logger = logger;
     }
 
     public async Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar)
@@ -57,4 +75,55 @@ public class UserService : IUserService
         return true;
     }
 
+    public async Task<UserDTO> Me(Guid userId)
+    {
+        var entity = await _userManager.FindByIdAsync(userId.ToString())
+            ?? throw new NotFoundException("User not found");
+
+        var file = Directory.GetFiles(Path.Combine(_env.ContentRootPath, _avatarConfig.Folder))
+            .Select(x => Path.GetFileName(x))
+            .FirstOrDefault(x => x.Contains(userId.ToString()));
+
+        var role = await _userManager.GetRolesAsync(entity);
+
+        var user = _mapper.Map<UserDTO>(entity);
+        user.UrlAvatar = string.Format(_avatarConfig.Path, file);
+        user.Role = role.FirstOrDefault()!;
+
+        return user;
+    }
+
+    public async Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordRequest request)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString())
+            ?? throw new NotFoundException("User not found");
+
+        var changePassword = await _userManager.ChangePasswordAsync(user, request.OldPassword, request.NewPassword);
+
+        if (!changePassword.Succeeded)
+        {
+            _logger.LogIdentityErrors(user, changePassword);
+            throw new UserManagerException("User errors:", changePassword.Errors);
+        }
+
+        return true;
+    }
+
+    public async Task<UserDTO> EditProfile(Guid userId, UpdateUserDTO dto)
+    {
+        var user = await _userManager.FindByIdAsync(userId.ToString())
+            ?? throw new NotFoundException("User not found");
+
+        _mapper.Map(dto, user);
+
+        var result = await _userManager.UpdateAsync(user);
+
+        if (!result.Succeeded)
+        {
+            _logger.LogIdentityErrors(user, result);
+            throw new UserManagerException("User errors:", result.Errors);
+        }
+
+        return _mapper.Map<UserDTO>(user);
+    }
 }
