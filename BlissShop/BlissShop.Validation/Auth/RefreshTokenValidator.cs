@@ -1,4 +1,4 @@
-﻿using BlissShop.Common.DTO;
+﻿using BlissShop.Common.DTO.Auth;
 using FluentValidation;
 
 namespace BlissShop.Validation.Auth;

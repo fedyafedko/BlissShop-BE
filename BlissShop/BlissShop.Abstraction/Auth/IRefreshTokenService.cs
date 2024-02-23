@@ -1,5 +1,4 @@
-﻿using BlissShop.Common.DTO;
-using BlissShop.Common.DTO.Auth;
+﻿using BlissShop.Common.DTO.Auth;
 
 namespace BlissShop.Abstraction.Auth;
 

@@ -1,5 +1,4 @@
 using BlissShop.Abstraction.Auth;
-using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Requests;
 using Microsoft.AspNetCore.Mvc;
