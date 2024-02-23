@@ -23,6 +23,9 @@ using Microsoft.AspNetCore.Mvc.ApplicationModels;
 using BlissShop.Abstraction.Users;
 using BlissShop.BLL.Services.Users;
 using Microsoft.Extensions.FileProviders;
+using FluentValidation;
+using FluentValidation.AspNetCore;
+using BlissShop.Validation.Auth;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -72,6 +75,9 @@ builder.Services.FluentEmail(builder.Configuration);
 // Seeding
 builder.Services.AddSeeding();
 
+builder.Services.AddFluentValidationAutoValidation();
+builder.Services.AddFluentValidationClientsideAdapters();
+builder.Services.AddValidatorsFromAssemblyContaining<SignUpValidator>();
 var tokenValidationParameters = new TokenValidationParameters
 {
     ValidateIssuerSigningKey = true,
