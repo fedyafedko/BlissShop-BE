@@ -4,6 +4,7 @@ using BlissShop.Abstraction.FluentEmail;
 using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
 using BlissShop.Common.Extentions;
+using BlissShop.Common.Responses;
 using BlissShop.Entities;
 using BlissShop.FluentEmail.MessageBase;
 using Microsoft.AspNetCore.Identity;
@@ -35,7 +36,7 @@ public class AuthService : IAuthService
         _emailConfirmationService = emailConfirmationService;
         _emailService = emailService;
     }
-    public async Task<RegisterResponseDTO> SignUpAsync(SignUpDTO dto)
+    public async Task<RegisterResponse> SignUpAsync(SignUpDTO dto)
     {
         var user = await _userManager.FindByEmailAsync(dto.Email);
 
@@ -67,7 +68,7 @@ public class AuthService : IAuthService
 
         await _emailService.SendAsync(user.Email!, new ConfirmedEmailMessage { Code = generatedCode });
 
-        return new RegisterResponseDTO { UserId = user.Id };
+        return new RegisterResponse { UserId = user.Id };
     }
 
     public async Task<AuthSuccessDTO> SignInAsync(SignInDTO dto)
