@@ -23,11 +23,11 @@ public class TokenService : ITokenService
     private readonly ILogger<AuthService> _logger;
 
     public TokenService(
-        IOptions<JwtConfig> jwtConfig,
+        JwtConfig jwtConfig,
         UserManager<User> userManager,
         ILogger<AuthService> logger)
     {
-        _jwtConfig = jwtConfig.Value;
+        _jwtConfig = jwtConfig;
         _userManager = userManager;
         _logger = logger;
     }

@@ -59,14 +59,14 @@ namespace BlissShop.Controllers
         public async Task<IActionResult> ForgotPassword(ForgotPasswordRequest request)
         {
             var result = await _passwordService.ForgotPasswordAsync(request);
-            return Ok(result);
+            return result ? Ok() : BadRequest();
         }
 
         [HttpPost("[action]")]
         public async Task<IActionResult> ResetPassword(ResetPasswordRequest request)
         {
             var result = await _passwordService.ResetPasswordAsync(request);
-            return Ok(result);
+            return result ? Ok() : BadRequest();
         }
     }
 }
