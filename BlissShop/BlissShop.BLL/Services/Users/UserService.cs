@@ -17,19 +17,19 @@ namespace BlissShop.BLL.Services.Users;
 
 public class UserService : IUserService
 {
-    private readonly AvatarConfig _avatarConfig;
+    private readonly FileConfig _fileConfig;
     private readonly UserManager<User> _userManager;
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<UserService> _logger;
     private readonly IMapper _mapper;
 
-    public UserService(AvatarConfig avatarConfig,
+    public UserService(FileConfig fileConfig,
         UserManager<User> userManager,
         IWebHostEnvironment env,
         IMapper mapper,
         ILogger<UserService> logger)
     {
-        _avatarConfig = avatarConfig;
+        _fileConfig = fileConfig;
         _userManager = userManager;
         _env = env;
         _mapper = mapper;
@@ -39,14 +39,14 @@ public class UserService : IUserService
     public async Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar)
     {
         var contetntPath = _env.ContentRootPath;
-        var path = Path.Combine(contetntPath, _avatarConfig.Folder);
+        var path = Path.Combine(contetntPath, _fileConfig.FolderForUserAvatar);
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
 
         var ext = Path.GetExtension(avatar.FileName);
 
-        if (!_avatarConfig.FileExtensions.Contains(ext))
+        if (!_fileConfig.FileExtensions.Contains(ext))
             throw new IncorrectParametersException("Invalid file extension");
 
         var newFileName = $"{userId}{ext}";
@@ -57,7 +57,7 @@ public class UserService : IUserService
 
         var result = new AvatarResponse
         {
-            Path = string.Format(_avatarConfig.Path, newFileName)
+            Path = string.Format(_fileConfig.Path, newFileName)
         };
 
         return result;
@@ -65,7 +65,7 @@ public class UserService : IUserService
     public async Task<bool> DeleteAvatarAsync(string avatar)
     {
         var wwwPath = _env.ContentRootPath;
-        var path = Path.Combine(wwwPath, _avatarConfig.Folder, avatar);
+        var path = Path.Combine(wwwPath, _fileConfig.FolderForUserAvatar, avatar);
 
         if (!File.Exists(path))
             throw new NotFoundException("File not found");
@@ -80,14 +80,14 @@ public class UserService : IUserService
         var entity = await _userManager.FindByIdAsync(userId.ToString())
             ?? throw new NotFoundException("User not found");
 
-        var file = Directory.GetFiles(Path.Combine(_env.ContentRootPath, _avatarConfig.Folder))
+        var file = Directory.GetFiles(Path.Combine(_env.ContentRootPath, _fileConfig.FolderForUserAvatar))
             .Select(x => Path.GetFileName(x))
             .FirstOrDefault(x => x.Contains(userId.ToString()));
 
         var role = await _userManager.GetRolesAsync(entity);
 
         var user = _mapper.Map<UserDTO>(entity);
-        user.UrlAvatar = string.Format(_avatarConfig.Path, file);
+        user.UrlAvatar = string.Format(_fileConfig.Path, file);
         user.Role = role.FirstOrDefault()!;
 
         return user;

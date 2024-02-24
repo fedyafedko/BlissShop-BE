@@ -1,6 +1,7 @@
 ﻿using BlissShop.Abstraction.Shop;
 using BlissShop.Common.DTO.Shop;
 using BlissShop.Common.Extensions;
+using BlissShop.Common.Requests.ShopAvatar;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,6 +60,22 @@ namespace BlissShop.Controllers
             var result = await _shopService.UpdateShopAsync(shopId, dto);
 
             return Ok(result);
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UploadAvatarAsync(UploadShopAvatarRequest request)
+        {
+            var result = await _shopService.UploadAvatarAsync(request);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("[action]")]
+        public async Task<IActionResult> DeleteAvatarAsync(DeleteShopAvatarRequest request)
+        {
+            var result = await _shopService.DeleteAvatarAsync(request);
+
+            return result ? NoContent() : NotFound();
         }
     }
 }

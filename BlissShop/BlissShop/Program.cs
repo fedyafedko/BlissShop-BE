@@ -37,7 +37,7 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<EmailConfig>()
        .AddConfig<GoogleAuthConfig>()
        .AddConfig<CallbackUrisConfig>()
-       .AddConfig<AvatarConfig>()
+       .AddConfig<FileConfig>()
        .AddConfig<AuthConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
