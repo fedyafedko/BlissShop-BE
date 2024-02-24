@@ -1,4 +1,6 @@
 ﻿using BlissShop.Common.DTO.Products;
+using BlissShop.Common.Requests.ProductImage;
+using BlissShop.Common.Responses;
 
 namespace BlissShop.Abstraction.Product;
 
@@ -9,4 +11,6 @@ public interface IProductService
     Task<bool> DeleteProductAsync(Guid sellerId, Guid id);
     Task<ProductDTO> GetProductByIdAsync(Guid id);
     Task<List<ProductDTO>> GetProductsForShopAsync(Guid shopId);
+    Task<ProductImagesResponse> UploadImagesAsync(Guid userId, UploadProductImageRequest request);
+    Task<bool> DeleteImagesAsync(Guid userId, DeleteProductImageRequest request);
 }

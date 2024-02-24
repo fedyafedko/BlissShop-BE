@@ -65,7 +65,8 @@ namespace BlissShop.Controllers
         [HttpPost("[action]")]
         public async Task<IActionResult> UploadAvatarAsync(UploadShopAvatarRequest request)
         {
-            var result = await _shopService.UploadAvatarAsync(request);
+            var userId = HttpContext.GetUserId();
+            var result = await _shopService.UploadAvatarAsync(userId, request);
 
             return Ok(result);
         }
@@ -73,7 +74,8 @@ namespace BlissShop.Controllers
         [HttpDelete("[action]")]
         public async Task<IActionResult> DeleteAvatarAsync(DeleteShopAvatarRequest request)
         {
-            var result = await _shopService.DeleteAvatarAsync(request);
+            var userId = HttpContext.GetUserId();
+            var result = await _shopService.DeleteAvatarAsync(userId, request);
 
             return result ? NoContent() : NotFound();
         }

@@ -1,6 +1,7 @@
 ﻿using BlissShop.Abstraction.Product;
 using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Extensions;
+using BlissShop.Common.Requests.ProductImage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -59,6 +60,24 @@ namespace BlissShop.Controllers
             var result = await _productService.GetProductsForShopAsync(shopId);
 
             return Ok(result);
-        }   
+        }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> UploadImagesAsync(UploadProductImageRequest request)
+        {
+            var userId = HttpContext.GetUserId();
+            var result = await _productService.UploadImagesAsync(userId, request);
+
+            return Ok(result);
+        }
+
+        [HttpDelete("[action]")]
+        public async Task<IActionResult> DeleteImagesAsync(DeleteProductImageRequest request)
+        {
+            var userId = HttpContext.GetUserId();
+            var result = await _productService.DeleteImagesAsync(userId, request);
+
+            return result ? NoContent() : NotFound();
+        }
     }
 }
