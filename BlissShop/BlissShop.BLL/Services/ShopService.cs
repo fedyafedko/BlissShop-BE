@@ -76,8 +76,8 @@ public class ShopService : IShopService
 
     public async Task<IEnumerable<ShopDTO>> GetShopsForSellerAsync(Guid sellerId)
     {
-        var entities = _shopRepository.Where(x => x.SellerId == sellerId);
-        var shops = await entities.ToListAsync();
+        var query = _shopRepository.Where(x => x.SellerId == sellerId);
+        var shops = await query.ToListAsync();
 
         return _mapper.Map<IEnumerable<ShopDTO>>(shops);
     }
