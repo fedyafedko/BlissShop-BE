@@ -95,7 +95,10 @@ public class ProductService : IProductService
 
         _mapper.Map(dto, product);
 
-        await _productRepository.UpdateAsync(product);
+        var result = await _productRepository.UpdateAsync(product);
+
+        if (!result)
+            _logger.LogError("Product was not updated");
 
         return _mapper.Map<ProductDTO>(product);
     }
