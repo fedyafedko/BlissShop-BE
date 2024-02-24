@@ -11,6 +11,6 @@ public interface IShopService
     Task<ShopDTO> UpdateShopAsync(Guid shopId, UpdateShopDTO dto);
     Task<bool> DeleteShopAsync(Guid sellerId, Guid id);
     Task<IEnumerable<ShopDTO>> GetShopsForSellerAsync(Guid sellerId);
-    Task<AvatarResponse> UploadAvatarAsync(UploadShopAvatarRequest request);
-    Task<bool> DeleteAvatarAsync(DeleteShopAvatarRequest request);
+    Task<AvatarResponse> UploadAvatarAsync(Guid userId, UploadShopAvatarRequest request);
+    Task<bool> DeleteAvatarAsync(Guid userId, DeleteShopAvatarRequest request);
 }

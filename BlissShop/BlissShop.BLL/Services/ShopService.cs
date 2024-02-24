@@ -97,12 +97,12 @@ public class ShopService : IShopService
         return _mapper.Map<ShopDTO>(shop);
     }
 
-    public async Task<AvatarResponse> UploadAvatarAsync(UploadShopAvatarRequest request)
+    public async Task<AvatarResponse> UploadAvatarAsync(Guid userId, UploadShopAvatarRequest request)
     {
         var shop = await _shopRepository.FirstOrDefaultAsync(x => x.Id == request.ShopId)
             ?? throw new NotFoundException($"Shop not found with such id: {request.ShopId}");
 
-        if (shop.SellerId != request.UserId)
+        if (shop.SellerId != userId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var contetntPath = _env.ContentRootPath;
@@ -130,12 +130,12 @@ public class ShopService : IShopService
         return result;
     }
 
-    public async Task<bool> DeleteAvatarAsync(DeleteShopAvatarRequest request)
+    public async Task<bool> DeleteAvatarAsync(Guid userId, DeleteShopAvatarRequest request)
     {
         var shop = await _shopRepository.FirstOrDefaultAsync(x => x.Id == request.ShopId)
             ?? throw new NotFoundException($"Shop not found with such id: {request.ShopId}");
 
-        if (shop.SellerId != request.UserId)
+        if (shop.SellerId != userId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var wwwPath = _env.ContentRootPath;
