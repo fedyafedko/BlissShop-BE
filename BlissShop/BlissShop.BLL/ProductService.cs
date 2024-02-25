@@ -18,7 +18,7 @@ public class ProductService : IProductService
 {
     private readonly IRepository<Product> _productRepository;
     private readonly IRepository<Shop> _shopRepository;
-    private readonly FileConfig _fileConfig;
+    private readonly ProductImagesConfig _productImagesConfig;
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<ProductService> _logger;
     private readonly IMapper _mapper;
@@ -28,14 +28,14 @@ public class ProductService : IProductService
         IRepository<Shop> shopRepository,
         ILogger<ProductService> logger,
         IMapper mapper,
-        FileConfig fileConfig,
+        ProductImagesConfig productImagesConfig,
         IWebHostEnvironment env)
     {
         _productRepository = productRepository;
         _shopRepository = shopRepository;
         _logger = logger;
         _mapper = mapper;
-        _fileConfig = fileConfig;
+        _productImagesConfig = productImagesConfig;
         _env = env;
     }
 
@@ -125,7 +125,7 @@ public class ProductService : IProductService
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var contetntPath = _env.ContentRootPath;
-        var path = Path.Combine(contetntPath, _fileConfig.FolderForProductImages, product.ShopId.ToString(), request.ProductId.ToString());
+        var path = Path.Combine(contetntPath, _productImagesConfig.Folder, product.ShopId.ToString(), request.ProductId.ToString());
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
@@ -138,7 +138,7 @@ public class ProductService : IProductService
             var fileName = image.FileName;
             var ext = Path.GetExtension(fileName);
 
-            if (!_fileConfig.FileExtensions.Contains(ext))
+            if (!_productImagesConfig.FileExtensions.Contains(ext))
                 throw new IncorrectParametersException("Invalid file extension");
 
             var filePath = Path.Combine(path, fileName);
@@ -146,7 +146,7 @@ public class ProductService : IProductService
             using var stream = new FileStream(filePath, FileMode.Create);
             await image.CopyToAsync(stream);
 
-            result.Paths.Add(string.Format(_fileConfig.Path, fileName));
+            result.Paths.Add(string.Format(_productImagesConfig.Path, product.ShopId, product.Id, fileName));
         }
 
         return result;
@@ -163,7 +163,7 @@ public class ProductService : IProductService
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var wwwPath = _env.ContentRootPath;
-        var productImegesPath = Path.Combine(wwwPath, _fileConfig.FolderForProductImages);
+        var productImegesPath = Path.Combine(wwwPath, _productImagesConfig.Folder);
         foreach (var image in request.Images)
         {
             var path = Path.Combine(productImegesPath, product.ShopId.ToString(), request.ProductId.ToString(), image);
