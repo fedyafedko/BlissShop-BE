@@ -17,20 +17,20 @@ namespace BlissShop.BLL.Services;
 public class ShopService : IShopService
 {
     private readonly IRepository<Shop> _shopRepository;
-    private readonly FileConfig _fileConfig;
+    private readonly ShopAvatarConfig _shopAvatarConfig;
     private readonly ILogger<ShopService> _logger;
     private readonly IWebHostEnvironment _env;
     private readonly IMapper _mapper;
 
     public ShopService(
         IRepository<Shop> shopRepository,
-        FileConfig fileConfig,
+        ShopAvatarConfig shopAvatarConfig,
         ILogger<ShopService> logger,
         IWebHostEnvironment env,
         IMapper mapper)
     {
         _shopRepository = shopRepository;
-        _fileConfig = fileConfig;
+        _shopAvatarConfig = shopAvatarConfig;
         _logger = logger;
         _env = env;
         _mapper = mapper;
@@ -106,7 +106,7 @@ public class ShopService : IShopService
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var contetntPath = _env.ContentRootPath;
-        var path = Path.Combine(contetntPath, _fileConfig.FolderForShopAvatar, request.ShopId.ToString());
+        var path = Path.Combine(contetntPath, _shopAvatarConfig.Folder, request.ShopId.ToString());
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
@@ -114,7 +114,7 @@ public class ShopService : IShopService
         var fileName = request.Avatar.FileName;
         var ext = Path.GetExtension(fileName);
 
-        if (!_fileConfig.FileExtensions.Contains(ext))
+        if (!_shopAvatarConfig.FileExtensions.Contains(ext))
             throw new IncorrectParametersException("Invalid file extension");
 
         var filePath = Path.Combine(path, fileName);
@@ -124,7 +124,7 @@ public class ShopService : IShopService
 
         var result = new AvatarResponse
         {
-            Path = string.Format(_fileConfig.Path, fileName)
+            Path = string.Format(_shopAvatarConfig.Path, shop.Id, fileName)
         };
 
         return result;
@@ -139,7 +139,7 @@ public class ShopService : IShopService
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var wwwPath = _env.ContentRootPath;
-        var path = Path.Combine(wwwPath, _fileConfig.FolderForShopAvatar, request.ShopId.ToString(), request.Avatar);
+        var path = Path.Combine(wwwPath, _shopAvatarConfig.Folder, request.ShopId.ToString(), request.Avatar);
 
         if (!File.Exists(path))
             throw new NotFoundException("File not found");
