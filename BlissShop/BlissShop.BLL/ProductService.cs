@@ -8,9 +8,12 @@ using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using Google.Apis.Logging;
+using LanguageExt.ClassInstances;
+using LanguageExt.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using System.IO;
 
 namespace BlissShop.BLL;
 
@@ -83,7 +86,21 @@ public class ProductService : IProductService
             .FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new NotFoundException($"Product not found with such id: {id}");
 
-        return _mapper.Map<ProductDTO>(product);
+        var result = _mapper.Map<ProductDTO>(product);
+
+        var filePath = Path.Combine(
+            _env.ContentRootPath,
+            _productImagesConfig.Folder,
+            product.ShopId.ToString(),
+            product.Id.ToString());
+        var files = Directory.GetFiles(filePath).Select(x => Path.GetFileName(x));
+
+        foreach (var file in files)
+        {
+            result.ImagesPath.Add(string.Format(_productImagesConfig.Path, product.ShopId, product.Id, file));
+        }
+
+        return result;
     }
 
     public async Task<List<ProductDTO>> GetProductsForShopAsync(Guid shopId)
@@ -91,7 +108,26 @@ public class ProductService : IProductService
         var query = _productRepository.Where(x => x.ShopId == shopId);
         var products = await query.ToListAsync();
 
-        return _mapper.Map<List<ProductDTO>>(products);
+        var result = _mapper.Map<List<ProductDTO>>(products);
+
+        foreach (var product in result)
+        {
+            var filePath = Path.Combine(
+                _env.ContentRootPath,
+                _productImagesConfig.Folder,
+                product.ShopId.ToString(),
+                product.Id.ToString());
+            var files = Directory.GetFiles(filePath).Select(x => Path.GetFileName(x));
+
+            product.ImagesPath ??= new List<string>();
+
+            foreach (var file in files)
+            {
+                product.ImagesPath.Add(string.Format(_productImagesConfig.Path, product.ShopId, product.Id, file));
+            }
+        }
+
+        return result;
     }
 
     public async Task<ProductDTO> UpdateProductAsync(Guid sellerId, Guid id, UpdateProductDTO dto)

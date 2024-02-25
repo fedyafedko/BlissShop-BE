@@ -6,6 +6,7 @@ namespace BlissShop.Entities;
 public class User : IdentityUser<Guid>
 {
     public string FullName { get; set; } = string.Empty;
+    public string AvatarName { get; set; } = string.Empty;
     public string? RefreshToken { get; set; }
     public DateTimeOffset RefreshTokenExpiresAt { get; set; }
 

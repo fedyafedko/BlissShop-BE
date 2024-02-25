@@ -71,15 +71,26 @@ public class ShopService : IShopService
         var shop = await _shopRepository.FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new NotFoundException($"Shop not found with such id: {id}");
 
-        return _mapper.Map<ShopDTO>(shop);
+        var result = _mapper.Map<ShopDTO>(shop);
+        result.Path = string.Format(_shopAvatarConfig.Path, shop.Id, shop.AvatarName);
+
+        return result;
     }
 
-    public async Task<IEnumerable<ShopDTO>> GetShopsForSellerAsync(Guid sellerId)
+    public async Task<List<ShopDTO>> GetShopsForSellerAsync(Guid sellerId)
     {
         var query = _shopRepository.Where(x => x.SellerId == sellerId);
         var shops = await query.ToListAsync();
 
-        return _mapper.Map<IEnumerable<ShopDTO>>(shops);
+        var result = _mapper.Map<List<ShopDTO>>(shops);
+
+        foreach (var shop in result)
+        {
+            var entity = _shopRepository.FirstOrDefault(x => x.Id == shop.Id);
+            shop.Path = string.Format(_shopAvatarConfig.Path, shop.Id, entity!.AvatarName);
+        }
+
+        return result;
     }
 
     public async Task<ShopDTO> UpdateShopAsync(Guid shopId, UpdateShopDTO dto)
@@ -111,6 +122,15 @@ public class ShopService : IShopService
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
 
+        if (!string.IsNullOrEmpty(shop.AvatarName))
+        {
+            var oldAvatarPath = Path.Combine(path, shop.AvatarName);
+            if (File.Exists(oldAvatarPath))
+            {
+                File.Delete(oldAvatarPath);
+            }
+        }
+
         var fileName = request.Avatar.FileName;
         var ext = Path.GetExtension(fileName);
 
@@ -121,6 +141,9 @@ public class ShopService : IShopService
 
         using var stream = new FileStream(filePath, FileMode.Create);
         await request.Avatar.CopyToAsync(stream);
+
+        shop.AvatarName = fileName;
+        await _shopRepository.UpdateAsync(shop);
 
         var result = new AvatarResponse
         {
