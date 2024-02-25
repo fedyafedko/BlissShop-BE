@@ -9,4 +9,5 @@ public class ProductDTO
     public string Description { get; set; } = string.Empty;
     public List<string> Tags { get; set; } = null!;
     public int Quantity { get; set; }
+    public List<string> ImagesPath { get; set; } = null!;
 }

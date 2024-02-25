@@ -38,11 +38,23 @@ public class UserService : IUserService
 
     public async Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar)
     {
+        var user = await _userManager.FindByIdAsync(userId.ToString())
+            ?? throw new NotFoundException("User not found");
+
         var contetntPath = _env.ContentRootPath;
         var path = Path.Combine(contetntPath, _userAvatarConfig.Folder);
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);
+
+        if (!string.IsNullOrEmpty(user.AvatarName))
+        {
+            var oldAvatarPath = Path.Combine(path, user.AvatarName);
+            if (File.Exists(oldAvatarPath))
+            {
+                File.Delete(oldAvatarPath);
+            }
+        }
 
         var ext = Path.GetExtension(avatar.FileName);
 
@@ -54,6 +66,9 @@ public class UserService : IUserService
 
         using var stream = new FileStream(filePath, FileMode.Create);
         await avatar.CopyToAsync(stream);
+
+        user.AvatarName = newFileName;
+        await _userManager.UpdateAsync(user);
 
         var result = new AvatarResponse
         {
