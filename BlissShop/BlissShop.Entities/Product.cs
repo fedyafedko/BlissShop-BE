@@ -15,4 +15,5 @@ public class Product : EntityBase
 
     public Shop Shop { get; set; } = null!;
     public List<Order> Orders { get; set; } = null!;
+    public List<ProductCartItem> ProductCartItem { get; set; } = null!;
 }
