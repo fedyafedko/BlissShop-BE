@@ -15,7 +15,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.IO;
 
-namespace BlissShop.BLL;
+namespace BlissShop.BLL.Services;
 
 public class ProductService : IProductService
 {
@@ -69,12 +69,12 @@ public class ProductService : IProductService
             .FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new NotFoundException($"Product not found with such id: {id}");
 
-        if(product.Shop.SellerId != sellerId)
+        if (product.Shop.SellerId != sellerId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var result = await _productRepository.DeleteAsync(product);
 
-        if(!result)
+        if (!result)
             _logger.LogError("Product was not deleted");
 
         return result;
