@@ -7,7 +7,6 @@ using BlissShop.Common.Extentions;
 using BlissShop.Common.Requests;
 using BlissShop.Common.Responses;
 using BlissShop.Entities;
-using Google.Apis.Logging;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;

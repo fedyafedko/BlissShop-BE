@@ -29,6 +29,8 @@ using BlissShop.Validation.Auth;
 using BlissShop.BLL.Services;
 using BlissShop.Abstraction.Shop;
 using BlissShop.Abstraction.Product;
+using Stripe;
+using BlissShop.Abstraction;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -41,6 +43,7 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<UserAvatarConfig>()
        .AddConfig<ShopAvatarConfig>()
        .AddConfig<ProductImagesConfig>()
+       .AddConfig<StripeConfig>()
        .AddConfig<AuthConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
@@ -60,7 +63,7 @@ builder.Services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
 //Services
 builder.Services.AddScoped<IAuthService, AuthService>();
-builder.Services.AddScoped<ITokenService, TokenService>();
+builder.Services.AddScoped<ITokenService, BlissShop.BLL.Services.Auth.TokenService>();
 builder.Services.AddScoped<IEmailConfirmationService, EmailConfirmationService>();
 builder.Services.AddScoped<IEmailService, EmailService>();
 builder.Services.AddScoped<IRefreshTokenService, RefreshTokenService>();
@@ -68,14 +71,20 @@ builder.Services.AddScoped<IGoogleAuthService, GoogleAuthService>();
 builder.Services.AddScoped<IPasswordService, PasswordService>();
 builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShopService, ShopService>();
-builder.Services.AddScoped<IProductService, ProductService>();
+builder.Services.AddScoped<IProductService, BlissShop.BLL.Services.ProductService>();
 builder.Services.AddScoped<IProductCartService, ProductCartService>();
+builder.Services.AddScoped<IPaymentService, PaymentService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddRoles<IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
+
+// Payment
+StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("StripeConfig:SecretKey");
+
+builder.Services.AddRouting(options => options.LowercaseUrls = true);
 
 // Fluent Email
 builder.Services.FluentEmail(builder.Configuration);
