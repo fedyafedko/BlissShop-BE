@@ -74,6 +74,7 @@ builder.Services.AddScoped<IShopService, ShopService>();
 builder.Services.AddScoped<IProductService, BlissShop.BLL.Services.ProductService>();
 builder.Services.AddScoped<IProductCartService, ProductCartService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IAddressService, AddressService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
