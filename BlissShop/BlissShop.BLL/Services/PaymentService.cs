@@ -1,6 +1,7 @@
 ﻿using BlissShop.Abstraction;
 using BlissShop.Common.Configs;
 using BlissShop.Common.Exceptions;
+using BlissShop.Common.Requests;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -13,6 +14,7 @@ namespace BlissShop.BLL.Services;
 public class PaymentService : IPaymentService
 {
     private readonly UserManager<User> _userManager;
+    private readonly IRepository<User> _userRepository;
     private readonly IRepository<ProductCart> _productCartRepository;
     private readonly IRepository<ProductCartItem> _productCartItemRepository;
     private readonly IRepository<Order> _orderRepository;
@@ -23,24 +25,31 @@ public class PaymentService : IPaymentService
         StripeConfig stripeConfig,
         UserManager<User> userManager,
         IRepository<Order> orderRepository,
-        IRepository<ProductCartItem> productCartItemRepository)
+        IRepository<ProductCartItem> productCartItemRepository,
+        IRepository<User> userRepository)
     {
         _productCartRepository = productCartRepository;
         _stripeConfig = stripeConfig;
         _userManager = userManager;
         _orderRepository = orderRepository;
         _productCartItemRepository = productCartItemRepository;
+        _userRepository = userRepository;
     }
 
-    public async Task<string> Checkout(Guid cartId, Guid userId)
+    public async Task<string> Checkout(Guid userId, PaymentRequest request)
     {
         var productCart = await _productCartRepository
             .Include(x => x.ProductCartItems).ThenInclude(x => x.Product)
-            .FirstOrDefaultAsync(x => x.Id == cartId && x.UserId == userId)
+            .FirstOrDefaultAsync(x => x.Id == request.CartId && x.UserId == userId)
             ?? throw new NotFoundException("Product not found");
 
-        var user = await _userManager.FindByIdAsync(userId.ToString())
+        var user = await _userRepository
+            .Include(x => x.Addresses)
+            .FirstOrDefaultAsync(x => x.Id == userId)
             ?? throw new NotFoundException("User not found");
+
+        if (user.Addresses.All(x => x.Id != request.AddressId))
+            throw new NotFoundException("Address not found");
 
         List<SessionLineItemOptions> items = new();
 
@@ -69,7 +78,8 @@ public class PaymentService : IPaymentService
             },  
             Metadata = new Dictionary<string, string>
             {
-                { "cartId", cartId.ToString() }
+                { "cartId", request.CartId.ToString() },
+                { "addressId", request.AddressId.ToString() }
             },
             CustomerEmail = user.Email,
             LineItems = items,
@@ -97,6 +107,7 @@ public class PaymentService : IPaymentService
             ?? throw new NotFoundException("User not found");
 
         var cartId = new Guid(session.Metadata["cartId"]);
+        var addressId = new Guid(session.Metadata["addressId"]);
 
         var productCart = await _productCartRepository
             .Include(x => x.ProductCartItems)
@@ -112,6 +123,7 @@ public class PaymentService : IPaymentService
             {
                 BuyerId = user.Id,
                 ProductId = item.ProductId,
+                AddressId = addressId,
                 Quantity = item.Quantity,
                 IsPaid = true
             });

@@ -3,6 +3,7 @@ using Stripe;
 using BlissShop.Common.Configs;
 using BlissShop.Abstraction;
 using BlissShop.Common.Extensions;
+using BlissShop.Common.Requests;
 
 namespace BlissShop.Controllers;
 
@@ -20,10 +21,10 @@ public class PaymentController : ControllerBase
     }
 
     [HttpPost]
-    public async Task<IActionResult> CheckOut(Guid cartId)
+    public async Task<IActionResult> CheckOut(PaymentRequest request)
     {
         var userId = HttpContext.GetUserId();
-        var result = await _paymentService.Checkout(cartId, userId);
+        var result = await _paymentService.Checkout(userId, request);
         return Ok(result);
     }
 

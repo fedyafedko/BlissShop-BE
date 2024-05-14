@@ -1,9 +1,10 @@
-﻿using Stripe;
+﻿using BlissShop.Common.Requests;
+using Stripe;
 
 namespace BlissShop.Abstraction;
 
 public interface IPaymentService
 {
-    Task<string> Checkout(Guid productId, Guid userId);
+    Task<string> Checkout(Guid userId, PaymentRequest request);
     Task<bool> HandleWebhook(Event stripeEvent);
 }

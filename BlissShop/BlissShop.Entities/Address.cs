@@ -13,4 +13,5 @@ public class Address : EntityBase
     public string ZipCode { get; set; } = string.Empty;
 
     public User User { get; set; } = null!;
+    public List<Order> Orders { get; set; } = new List<Order>();
 }
