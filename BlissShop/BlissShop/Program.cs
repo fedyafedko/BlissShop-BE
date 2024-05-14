@@ -31,6 +31,7 @@ using BlissShop.Abstraction.Shop;
 using BlissShop.Abstraction.Product;
 using Stripe;
 using BlissShop.Abstraction;
+using BlissShop.Extentions;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -176,6 +177,8 @@ app.UseStaticFiles(new StaticFileOptions
     FileProvider = new PhysicalFileProvider(Path.Combine(Directory.GetCurrentDirectory(), "Uploads")),
     RequestPath = "/Uploads"
 });
+
+app.MigrateDatabase();
 
 app.UseHttpsRedirection();
 app.UseCors(
