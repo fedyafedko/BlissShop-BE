@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlissShop.Abstraction.FluentEmail;
 using BlissShop.Abstraction.Shop;
 using BlissShop.Common.Configs;
 using BlissShop.Common.DTO.Shop;
@@ -7,8 +8,10 @@ using BlissShop.Common.Requests.ShopAvatar;
 using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
+using BlissShop.FluentEmail.MessageBase;
+using LanguageExt.Pipes;
 using Microsoft.AspNetCore.Hosting;
-using Microsoft.AspNetCore.Http;
+using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 
@@ -16,29 +19,42 @@ namespace BlissShop.BLL.Services;
 
 public class ShopService : IShopService
 {
+    private readonly UserManager<User> _userManager;
     private readonly IRepository<Shop> _shopRepository;
     private readonly ShopAvatarConfig _shopAvatarConfig;
+    private readonly CallbackUrisConfig _callbackUrisConfig;
+    private readonly IEmailService _emailService;
     private readonly ILogger<ShopService> _logger;
     private readonly IWebHostEnvironment _env;
     private readonly IMapper _mapper;
 
     public ShopService(
+        UserManager<User> userManager,
         IRepository<Shop> shopRepository,
         ShopAvatarConfig shopAvatarConfig,
+        IEmailService emailService,
         ILogger<ShopService> logger,
         IWebHostEnvironment env,
-        IMapper mapper)
+        IMapper mapper,
+        CallbackUrisConfig callbackUrisConfig)
     {
+        _userManager = userManager;
         _shopRepository = shopRepository;
         _shopAvatarConfig = shopAvatarConfig;
+        _emailService = emailService;
         _logger = logger;
         _env = env;
         _mapper = mapper;
+        _callbackUrisConfig = callbackUrisConfig;
     }
 
     public async Task<ShopDTO> AddShopAsync(Guid userId, CreateShopDTO dto)
     {
         var shop = _mapper.Map<Shop>(dto);
+
+        var usersInRole = await _userManager.GetUsersInRoleAsync("Admin");
+        var admin = usersInRole.FirstOrDefault() 
+            ?? throw new NotFoundException("Admin not found");
 
         shop.SellerId = userId;
 
@@ -46,6 +62,10 @@ public class ShopService : IShopService
 
         if (!result)
             _logger.LogError("Shop was not created");
+
+        var uri = string.Format(_callbackUrisConfig.AprovedShopUri, shop.Id);
+
+        await _emailService.SendAsync(new AprovedShopMessage { Recipient = admin.Email!, Shop = shop, Uri = uri });
 
         return _mapper.Map<ShopDTO>(shop);
     }
@@ -168,6 +188,31 @@ public class ShopService : IShopService
             throw new NotFoundException("File not found");
 
         await Task.Run(() => File.Delete(path));
+
+        return true;
+    }
+
+    public async Task<bool> AprovedShopAsync(Guid shopId, bool isAproved)
+    {
+        var shop = await _shopRepository
+            .Include(x => x.User)
+            .FirstOrDefaultAsync(x => x.Id == shopId)
+            ?? throw new NotFoundException($"Shop not found with such id: {shopId}");
+
+        var seller = await _userManager.FindByIdAsync(shop.SellerId.ToString())
+            ?? throw new NotFoundException("Seller not found");
+
+        if (isAproved)
+        {
+            shop.IsAproved = true;
+            await _shopRepository.UpdateAsync(shop);
+            await _emailService.SendAsync(new ShopIsAprovedMessage { Recipient = seller.Email!, Shop = shop });
+        }
+        else
+        {
+            await _shopRepository.DeleteAsync(shop);
+            await _emailService.SendAsync(new ShopIsNotAprovedMessage { Recipient = seller.Email!, Shop = shop });
+        }
 
         return true;
     }

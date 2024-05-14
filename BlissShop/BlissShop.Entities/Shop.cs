@@ -9,6 +9,7 @@ public class Shop : EntityBase
     public Guid SellerId { get; set; }
     public string Name { get; set; } = string.Empty;
     public string Description { get; set; } = string.Empty;
+    public bool IsAproved { get; set; }
     public string AvatarName { get; set; } = string.Empty;
 
     public User User { get; set; } = null!;

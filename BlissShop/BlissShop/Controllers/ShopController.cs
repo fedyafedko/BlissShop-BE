@@ -79,5 +79,14 @@ namespace BlissShop.Controllers
 
             return result ? NoContent() : NotFound();
         }
+
+        [HttpPut("[action]")]
+        [Authorize(Roles = "Admin")]
+        public async Task<IActionResult> IsAprovedShop(Guid shopId, bool isAproved)
+        {
+            var result = await _shopService.AprovedShopAsync(shopId, isAproved);
+
+            return Ok(result);
+        }
     }
 }

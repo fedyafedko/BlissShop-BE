@@ -3,4 +3,5 @@
 public class CallbackUrisConfig : ConfigBase
 {
     public string ResetPasswordUri { get; set; } = string.Empty;
+    public string AprovedShopUri { get; set; } = string.Empty;
 }
