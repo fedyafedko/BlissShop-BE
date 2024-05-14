@@ -13,4 +13,5 @@ public interface IShopService
     Task<List<ShopDTO>> GetShopsForSellerAsync(Guid sellerId);
     Task<AvatarResponse> UploadAvatarAsync(Guid userId, UploadShopAvatarRequest request);
     Task<bool> DeleteAvatarAsync(Guid userId, DeleteShopAvatarRequest request);
+    Task<bool> AprovedShopAsync(Guid shopId, bool isAproved);
 }

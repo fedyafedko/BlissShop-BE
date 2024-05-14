@@ -66,7 +66,7 @@ public class AuthService : IAuthService
 
         var generatedCode = await _emailConfirmationService.GenerateEmailCodeAsync(user.Id);
 
-        await _emailService.SendAsync(user.Email!, new ConfirmedEmailMessage { Code = generatedCode });
+        await _emailService.SendAsync(new ConfirmedEmailMessage { Recipient = user.Email!, Code = generatedCode });
 
         return new RegisterResponse { UserId = user.Id };
     }

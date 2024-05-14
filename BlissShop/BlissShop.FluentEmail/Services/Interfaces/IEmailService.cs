@@ -4,6 +4,6 @@ namespace BlissShop.Abstraction.FluentEmail;
 
 public interface IEmailService
 {
-    Task<bool> SendAsync<T>(string to, T message)
+    Task<bool> SendAsync<T>(T message)
         where T : EmailMessageBase;
 }
