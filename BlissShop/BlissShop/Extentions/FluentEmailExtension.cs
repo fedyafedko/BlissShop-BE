@@ -1,7 +1,4 @@
-﻿using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Configuration;
-
-using System.Net;
+﻿using System.Net;
 using System.Net.Mail;
 
 namespace BlissShop.Common.Extentions;
