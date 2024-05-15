@@ -16,12 +16,13 @@ public class EmailService : IEmailService
         _emailConfig = emailConfig;
     }
 
-    public async Task<bool> SendAsync<T>(T message)
+    public async Task<bool> SendAsync<T>(T message, string? from = null)
         where T : EmailMessageBase
     {
         var path = $@"{Directory.GetCurrentDirectory()}{_emailConfig.MessagePath}\{message.TemplateName}.cshtml";
         var sendEmail = await _fluentEmail
-                  .To(message.Recipient)
+                  .SetFrom(from ?? _emailConfig.DefaultFromEmail)
+                  .To(message.Recipient ?? _emailConfig.DefaultFromEmail)
                   .Subject(message.Subject)
                   .UsingTemplateFromFile(path, message)
                   .SendAsync();
