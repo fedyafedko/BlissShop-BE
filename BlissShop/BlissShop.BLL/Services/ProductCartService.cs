@@ -1,5 +1,8 @@
-﻿using BlissShop.Abstraction.Product;
+﻿using AutoMapper;
+using BlissShop.Abstraction.Product;
 using BlissShop.Common.DTO.Products;
+using BlissShop.Common.Exceptions;
+using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using Microsoft.AspNetCore.Identity;
@@ -15,19 +18,22 @@ public class ProductCartService : IProductCartService
     private readonly IRepository<Product> _productRepository;
     private readonly UserManager<User> _userManager;
     private readonly ILogger<ProductCartService> _logger;
+    private readonly IMapper _mapper;
 
     public ProductCartService(
         IRepository<ProductCart> productCartRepository,
         IRepository<ProductCartItem> productCartItemsRepository,
         IRepository<Product> productRepository,
         UserManager<User> userManager,
-        ILogger<ProductCartService> logger)
+        ILogger<ProductCartService> logger,
+        IMapper mapper)
     {
         _productCartRepository = productCartRepository;
         _productCartItemsRepository = productCartItemsRepository;
         _productRepository = productRepository;
         _userManager = userManager;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<bool> AddToProductCart(Guid userId, AddProductCartDTO dto)
@@ -51,7 +57,12 @@ public class ProductCartService : IProductCartService
         }
 
         var product = await _productRepository.FirstOrDefaultAsync(x => x.Id == dto.ProductId)
-            ?? throw new Exception("Product not found");
+            ?? throw new NotFoundException("Product not found");
+
+        if (product.Quantity < dto.Quantity)
+        {
+            throw new NotFoundException("Not enough products in stock");
+        }
 
         if (productCart.ProductCartItems != null &&productCart.ProductCartItems.Any(x => x.ProductId == dto.ProductId))
         {
@@ -123,6 +134,37 @@ public class ProductCartService : IProductCartService
 
         productCart.TotalPrice += (double)product.Price * dto.Quantity;
         await _productCartRepository.UpdateAsync(productCart);
+        return result;
+    }
+
+    public async Task<ProductCartResponse> GetProductCart(Guid userId)
+    {
+        var user = _userManager.FindByIdAsync(userId.ToString())
+            ?? throw new Exception("User not found");
+
+        var productCart = await _productCartRepository
+            .Include(x => x.ProductCartItems)
+            .ThenInclude(x => x.Product)
+            .FirstOrDefaultAsync(x => x.UserId == userId)
+            ?? throw new Exception("Product cart not found");
+
+        var products = new List<ProductCartItemResponse>();
+
+        foreach (var item in productCart.ProductCartItems)
+        {
+            products.Add(new ProductCartItemResponse
+            {
+                Product = _mapper.Map<ProductDTO>(item.Product),
+                Quantity = item.Quantity,
+            });
+        }
+
+        var result = new ProductCartResponse
+        {
+            Products = products,
+            TotalPrice = (decimal)productCart.TotalPrice,
+        };
+
         return result;
     }
 }

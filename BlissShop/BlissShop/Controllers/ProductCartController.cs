@@ -16,6 +16,15 @@ namespace BlissShop.Controllers
             _productCartService = productCartService;
         }
 
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetProductCart()
+        {
+            var userId = HttpContext.GetUserId();
+            var result = await _productCartService.GetProductCart(userId);
+
+            return Ok(result);
+        }
+
         [HttpPost]
         public async Task<IActionResult> AddToProductCart(AddProductCartDTO dto)
         {
