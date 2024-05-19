@@ -132,7 +132,10 @@ public class PaymentService : IPaymentService
         var result = await _orderRepository.InsertManyAsync(order);
 
         if (result)
+        {
+            productCart.TotalPrice = 0;
             await _productCartItemRepository.DeleteManyAsync(productCart.ProductCartItems);
+        }
 
         return result;
     }
