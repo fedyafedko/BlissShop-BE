@@ -14,4 +14,5 @@ public class Shop : EntityBase
 
     public User User { get; set; } = null!;
     public List<Product> Products { get; set; } = null!;
+    public List<ShopFollower> Followers { get; set; } = new List<ShopFollower>();
 }

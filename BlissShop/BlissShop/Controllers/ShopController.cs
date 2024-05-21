@@ -88,5 +88,23 @@ namespace BlissShop.Controllers
 
             return Ok(result);
         }
+
+        [HttpPost("[action]")]
+        public async Task<IActionResult> Follow(Guid shopId)
+        {
+            var userId = HttpContext.GetUserId();
+            var result = await _shopService.FollowAsync(userId, shopId);
+
+            return result ? Ok() : BadRequest();
+        }
+
+        [HttpDelete("[action]")]
+        public async Task<IActionResult> Unfollow(Guid shopId)
+        {
+            var userId = HttpContext.GetUserId();
+            var result = await _shopService.UnfollowAsync(userId, shopId);
+            
+            return result ? NoContent() : NotFound();
+        }
     }
 }
