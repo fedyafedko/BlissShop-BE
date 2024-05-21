@@ -77,6 +77,7 @@ builder.Services.AddScoped<IProductCartService, ProductCartService>();
 builder.Services.AddScoped<IPaymentService, PaymentService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
+builder.Services.AddScoped<IRatingService, RatingService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
