@@ -24,6 +24,7 @@ public class ShopService : IShopService
     private readonly IRepository<Shop> _shopRepository;
     private readonly ShopAvatarConfig _shopAvatarConfig;
     private readonly CallbackUrisConfig _callbackUrisConfig;
+    private readonly IRepository<ShopFollower> _shopFollowerRepository;
     private readonly IEmailService _emailService;
     private readonly ILogger<ShopService> _logger;
     private readonly IWebHostEnvironment _env;
@@ -37,7 +38,8 @@ public class ShopService : IShopService
         ILogger<ShopService> logger,
         IWebHostEnvironment env,
         IMapper mapper,
-        CallbackUrisConfig callbackUrisConfig)
+        CallbackUrisConfig callbackUrisConfig,
+        IRepository<ShopFollower> shopFollowerRepository)
     {
         _userManager = userManager;
         _shopRepository = shopRepository;
@@ -47,6 +49,7 @@ public class ShopService : IShopService
         _env = env;
         _mapper = mapper;
         _callbackUrisConfig = callbackUrisConfig;
+        _shopFollowerRepository = shopFollowerRepository;
     }
 
     public async Task<ShopDTO> AddShopAsync(Guid userId, CreateShopDTO dto)
@@ -220,5 +223,48 @@ public class ShopService : IShopService
         }
 
         return true;
+    }
+
+    public async Task<bool> FollowAsync(Guid userId, Guid shopId)
+    {
+        var shop = await _shopRepository.FirstOrDefaultAsync(x => x.Id == shopId)
+            ?? throw new NotFoundException($"Shop not found with such id: {shopId}");
+
+        var user = await _userManager.FindByIdAsync(userId.ToString())
+            ?? throw new NotFoundException("User not found");
+
+        if (shop.SellerId == userId)
+            throw new IncorrectParametersException("Seller can't follow his shop");
+
+        var entity = await _shopFollowerRepository.FirstOrDefaultAsync(x => x.UserId == userId && x.ShopId == shopId);
+
+        if (entity != null)
+            throw new IncorrectParametersException("User already follows this shop");
+
+        entity = new ShopFollower
+        {
+            ShopId = shopId,
+            UserId = userId
+        };
+
+        var result = await _shopFollowerRepository.InsertAsync(entity);
+
+        if (!result)
+            _logger.LogError("Failed to follow shop");
+
+        return result;
+    }
+
+    public async Task<bool> UnfollowAsync(Guid userId, Guid shopId)
+    {
+        var entity = await _shopFollowerRepository.FirstOrDefaultAsync(x => x.UserId == userId && x.ShopId == shopId)
+            ?? throw new NotFoundException("Shop follower not found");
+
+        var result = await _shopFollowerRepository.DeleteAsync(entity);
+
+        if (!result)
+            _logger.LogError("Failed to unfollow shop");
+
+        return result;
     }
 }

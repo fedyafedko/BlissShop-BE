@@ -11,6 +11,7 @@ public class User : IdentityUser<Guid>
     public DateTimeOffset RefreshTokenExpiresAt { get; set; }
 
     public List<Shop> Shops { get; set; } = null!;
+    public List<ShopFollower> FollowerShops { get; set; } = new List<ShopFollower>();
     public List<Order> Orders { get; set; } = null!;
     public List<Address> Addresses { get; set; } = null!;
     public ProductCart ProductCart { get; set; } = null!;
