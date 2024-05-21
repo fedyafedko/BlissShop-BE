@@ -3,6 +3,7 @@ using BlissShop.Abstraction.Product;
 using BlissShop.Common.Configs;
 using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Exceptions;
+using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests.ProductImage;
 using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
@@ -88,17 +89,7 @@ public class ProductService : IProductService
 
         var result = _mapper.Map<ProductDTO>(product);
 
-        var filePath = Path.Combine(
-            _env.ContentRootPath,
-            _productImagesConfig.Folder,
-            product.ShopId.ToString(),
-            product.Id.ToString());
-        var files = Directory.GetFiles(filePath).Select(x => Path.GetFileName(x));
-
-        foreach (var file in files)
-        {
-            result.ImagesPath.Add(string.Format(_productImagesConfig.Path, product.ShopId, product.Id, file));
-        }
+        result.ImagesPath = _env.ContentRootPath.GetImagePath(result, _productImagesConfig);
 
         return result;
     }
@@ -112,19 +103,7 @@ public class ProductService : IProductService
 
         foreach (var product in result)
         {
-            var filePath = Path.Combine(
-                _env.ContentRootPath,
-                _productImagesConfig.Folder,
-                product.ShopId.ToString(),
-                product.Id.ToString());
-            var files = Directory.GetFiles(filePath).Select(x => Path.GetFileName(x));
-
-            product.ImagesPath ??= new List<string>();
-
-            foreach (var file in files)
-            {
-                product.ImagesPath.Add(string.Format(_productImagesConfig.Path, product.ShopId, product.Id, file));
-            }
+            product.ImagesPath = _env.ContentRootPath.GetImagePath(product, _productImagesConfig);
         }
 
         return result;
@@ -177,6 +156,8 @@ public class ProductService : IProductService
             if (!_productImagesConfig.FileExtensions.Contains(ext))
                 throw new IncorrectParametersException("Invalid file extension");
 
+            var uniqueSuffix = DateTime.UtcNow.Ticks;
+            fileName = $"product_{uniqueSuffix}{ext}";
             var filePath = Path.Combine(path, fileName);
 
             using var stream = new FileStream(filePath, FileMode.Create);
@@ -207,7 +188,7 @@ public class ProductService : IProductService
             if (!File.Exists(path))
                 throw new NotFoundException("File not found");
 
-            await Task.Run(() => File.Delete(path));
+            File.Delete(path);
         }
 
         return true;

@@ -14,6 +14,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BlissShop.BLL.Services;
 
@@ -92,7 +93,8 @@ public class ShopService : IShopService
             ?? throw new NotFoundException($"Shop not found with such id: {id}");
 
         var result = _mapper.Map<ShopDTO>(shop);
-        result.Path = string.Format(_shopAvatarConfig.Path, shop.Id, shop.AvatarName);
+        if (!shop.AvatarName.IsNullOrEmpty())
+            result.Path = string.Format(_shopAvatarConfig.Path, shop.Id, shop.AvatarName);
 
         return result;
     }
@@ -107,7 +109,8 @@ public class ShopService : IShopService
         foreach (var shop in result)
         {
             var entity = _shopRepository.FirstOrDefault(x => x.Id == shop.Id);
-            shop.Path = string.Format(_shopAvatarConfig.Path, shop.Id, entity!.AvatarName);
+            if (!entity!.AvatarName.IsNullOrEmpty())
+                shop.Path = string.Format(_shopAvatarConfig.Path, shop.Id, entity!.AvatarName);
         }
 
         return result;
@@ -157,6 +160,8 @@ public class ShopService : IShopService
         if (!_shopAvatarConfig.FileExtensions.Contains(ext))
             throw new IncorrectParametersException("Invalid file extension");
 
+        var uniqueSuffix = DateTime.UtcNow.Ticks;
+        fileName = $"shop_{uniqueSuffix}{ext}";
         var filePath = Path.Combine(path, fileName);
 
         using var stream = new FileStream(filePath, FileMode.Create);

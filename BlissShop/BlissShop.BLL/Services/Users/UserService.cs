@@ -11,6 +11,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BlissShop.BLL.Services.Users;
 
@@ -101,7 +102,8 @@ public class UserService : IUserService
         var role = await _userManager.GetRolesAsync(entity);
 
         var user = _mapper.Map<UserDTO>(entity);
-        user.UrlAvatar = string.Format(_userAvatarConfig.Path, file);
+        if (!entity.AvatarName.IsNullOrEmpty())
+            user.UrlAvatar = string.Format(_userAvatarConfig.Path, file);
         user.Role = role.FirstOrDefault()!;
 
         return user;
