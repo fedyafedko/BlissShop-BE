@@ -1,10 +1,13 @@
 ﻿using AutoMapper;
 using BlissShop.Abstraction.Product;
+using BlissShop.Common.Configs;
 using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Exceptions;
+using BlissShop.Common.Extensions;
 using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
@@ -18,6 +21,8 @@ public class ProductCartService : IProductCartService
     private readonly IRepository<Product> _productRepository;
     private readonly UserManager<User> _userManager;
     private readonly ILogger<ProductCartService> _logger;
+    private readonly ProductImagesConfig _productImagesConfig;
+    private readonly IWebHostEnvironment _env;
     private readonly IMapper _mapper;
 
     public ProductCartService(
@@ -26,7 +31,9 @@ public class ProductCartService : IProductCartService
         IRepository<Product> productRepository,
         UserManager<User> userManager,
         ILogger<ProductCartService> logger,
-        IMapper mapper)
+        IMapper mapper,
+        IWebHostEnvironment env,
+        ProductImagesConfig productImagesConfig)
     {
         _productCartRepository = productCartRepository;
         _productCartItemsRepository = productCartItemsRepository;
@@ -34,6 +41,8 @@ public class ProductCartService : IProductCartService
         _userManager = userManager;
         _logger = logger;
         _mapper = mapper;
+        _env = env;
+        _productImagesConfig = productImagesConfig;
     }
 
     public async Task<bool> AddToProductCart(Guid userId, AddProductCartDTO dto)
@@ -139,7 +148,7 @@ public class ProductCartService : IProductCartService
 
     public async Task<ProductCartResponse> GetProductCart(Guid userId)
     {
-        var user = _userManager.FindByIdAsync(userId.ToString())
+        var user = await _userManager.FindByIdAsync(userId.ToString())
             ?? throw new Exception("User not found");
 
         var productCart = await _productCartRepository
@@ -164,6 +173,11 @@ public class ProductCartService : IProductCartService
             Products = products,
             TotalPrice = (decimal)productCart.TotalPrice,
         };
+
+        foreach (var product in result.Products)
+        {
+            product.Product.ImagesPath = _env.ContentRootPath.GetImagePath(product.Product, _productImagesConfig);
+        }
 
         return result;
     }
