@@ -1,4 +1,6 @@
-﻿namespace BlissShop.Common.DTO.Products;
+﻿using Microsoft.AspNetCore.Http;
+
+namespace BlissShop.Common.DTO.Products;
 
 public class CreateProductDTO
 {
@@ -8,4 +10,5 @@ public class CreateProductDTO
     public string Description { get; set; } = string.Empty;
     public List<string> Tags { get; set; } = null!;
     public int Quantity { get; set; }
+    public List<IFormFile> Images { get; set; } = null!;
 }

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using BlissShop.Abstraction.FluentEmail;
 using BlissShop.Abstraction.Product;
 using BlissShop.Common.Configs;
 using BlissShop.Common.DTO.Products;
@@ -8,6 +9,7 @@ using BlissShop.Common.Requests.ProductImage;
 using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
+using BlissShop.FluentEmail.MessageBase;
 using Google.Apis.Logging;
 using LanguageExt.ClassInstances;
 using LanguageExt.Common;
@@ -20,27 +22,36 @@ namespace BlissShop.BLL.Services;
 
 public class ProductService : IProductService
 {
+    private readonly IRepository<ShopFollower> _followerRepository;
     private readonly IRepository<Product> _productRepository;
     private readonly IRepository<Shop> _shopRepository;
+    private readonly IEmailService _emailService;
     private readonly ProductImagesConfig _productImagesConfig;
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<ProductService> _logger;
     private readonly IMapper _mapper;
+    private readonly CallbackUrisConfig _callbackUrisConfig;
 
     public ProductService(
+        IRepository<ShopFollower> followerRepository,
         IRepository<Product> productRepository,
         IRepository<Shop> shopRepository,
         ILogger<ProductService> logger,
         IMapper mapper,
         ProductImagesConfig productImagesConfig,
-        IWebHostEnvironment env)
+        IWebHostEnvironment env,
+        IEmailService emailService,
+        CallbackUrisConfig callbackUrisConfig)
     {
+        _followerRepository = followerRepository;
         _productRepository = productRepository;
         _shopRepository = shopRepository;
         _logger = logger;
         _mapper = mapper;
         _productImagesConfig = productImagesConfig;
         _env = env;
+        _emailService = emailService;
+        _callbackUrisConfig = callbackUrisConfig;
     }
 
     public async Task<ProductDTO> AddProductAsync(Guid sellerId, CreateProductDTO dto)
@@ -59,9 +70,21 @@ public class ProductService : IProductService
         if (!result)
             _logger.LogError("Product was not created");
 
-        return _mapper.Map<ProductDTO>(product);
-    }
+        var images = new UploadProductImageRequest
+        {
+            ProductId = product.Id,
+            Images = dto.Images
+        };
 
+        await UploadImagesAsync(sellerId, images);
+
+        var productMessage = _mapper.Map<ProductDTO>(product);
+        productMessage.ImagesPath = _env.ContentRootPath.GetImagePath(productMessage, _productImagesConfig);
+
+        await SendMessagesForFollowersAsync(shop.Id, productMessage);
+
+        return productMessage;
+    }
 
     public async Task<bool> DeleteProductAsync(Guid sellerId, Guid id)
     {
@@ -192,5 +215,33 @@ public class ProductService : IProductService
         }
 
         return true;
+    }
+    
+    private async Task<bool> SendMessagesForFollowersAsync(Guid shopId, ProductDTO product)
+    {
+        var followers = await _followerRepository.Include(x => x.User).Where(x => x.ShopId == shopId).ToListAsync();
+
+        //ToDo: Send messages to followers with settings
+        var emails = followers.Select(x => x.User.Email).ToList();
+
+        var messages = new List<NewProductMessage>();
+
+        if(emails.Count == 0)
+            return true;
+
+        foreach (var email in emails)
+        {
+            var message = new NewProductMessage
+            {
+                Recipient = email!,
+                Product = product,
+                Uri = string.Format(_callbackUrisConfig.NewProductUri, product.Id)
+            };
+            messages.Add(message);
+        }
+
+        var result = await _emailService.SendManyAsync(messages);
+
+        return result;
     }
 }
