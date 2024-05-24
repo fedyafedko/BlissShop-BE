@@ -1,6 +1,7 @@
 ﻿using BlissShop.Abstraction.Product;
 using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Extensions;
+using BlissShop.Common.Requests;
 using BlissShop.Common.Requests.ProductImage;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
@@ -78,6 +79,14 @@ namespace BlissShop.Controllers
             var result = await _productService.DeleteImagesAsync(userId, request);
 
             return result ? NoContent() : NotFound();
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> SearchProduct([FromQuery] SearchProductRequest request)
+        {
+            var result = await _productService.SearchProductAsync(request);
+
+            return Ok(result);
         }
     }
 }

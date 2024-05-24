@@ -1,4 +1,5 @@
 ﻿using BlissShop.Common.DTO.Products;
+using BlissShop.Common.Requests;
 using BlissShop.Common.Requests.ProductImage;
 using BlissShop.Common.Responses;
 
@@ -13,4 +14,5 @@ public interface IProductService
     Task<List<ProductDTO>> GetProductsForShopAsync(Guid shopId);
     Task<ProductImagesResponse> UploadImagesAsync(Guid userId, UploadProductImageRequest request);
     Task<bool> DeleteImagesAsync(Guid userId, DeleteProductImageRequest request);
+    Task<PageList<ProductDTO>> SearchProductAsync(SearchProductRequest request);
 }
