@@ -5,6 +5,7 @@ using BlissShop.Common.Configs;
 using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Exceptions;
 using BlissShop.Common.Extensions;
+using BlissShop.Common.Requests;
 using BlissShop.Common.Requests.ProductImage;
 using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
@@ -17,6 +18,7 @@ using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using System.IO;
+using System.Linq;
 
 namespace BlissShop.BLL.Services;
 
@@ -241,6 +243,29 @@ public class ProductService : IProductService
         }
 
         var result = await _emailService.SendManyAsync(messages);
+
+        return result;
+    }
+
+    public async Task<PageList<ProductDTO>> SearchProductAsync(SearchProductRequest request)
+    {
+        var products = await _productRepository.ToListAsync();
+
+        if (!string.IsNullOrEmpty(request.Search))
+        {
+            products = products
+                .Where(x => x.Name.Contains(request.Search) || x.Tags.Contains(request.Search))
+                .ToList();
+        }
+
+        var searchProducts = _mapper.Map<List<ProductDTO>>(products);
+
+        foreach (var product in searchProducts)
+        {
+            product.ImagesPath = _env.ContentRootPath.GetImagePath(product, _productImagesConfig);
+        }
+
+        var result = searchProducts.Pagination(request.Page, request.PageSize);
 
         return result;
     }
