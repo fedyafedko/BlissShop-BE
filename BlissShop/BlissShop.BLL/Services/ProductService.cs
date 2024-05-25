@@ -11,14 +11,9 @@ using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using BlissShop.FluentEmail.MessageBase;
-using Google.Apis.Logging;
-using LanguageExt.ClassInstances;
-using LanguageExt.Common;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
-using System.IO;
-using System.Linq;
 
 namespace BlissShop.BLL.Services;
 

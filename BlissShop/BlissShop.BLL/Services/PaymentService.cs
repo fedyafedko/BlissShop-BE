@@ -1,9 +1,15 @@
-﻿using BlissShop.Abstraction;
+﻿using AutoMapper;
+using BlissShop.Abstraction;
+using BlissShop.Abstraction.FluentEmail;
 using BlissShop.Common.Configs;
+using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Exceptions;
+using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
+using BlissShop.FluentEmail.MessageBase;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
@@ -14,11 +20,15 @@ namespace BlissShop.BLL.Services;
 public class PaymentService : IPaymentService
 {
     private readonly UserManager<User> _userManager;
+    private readonly IEmailService _emailService;
     private readonly IRepository<User> _userRepository;
     private readonly IRepository<ProductCart> _productCartRepository;
     private readonly IRepository<ProductCartItem> _productCartItemRepository;
+    private readonly ProductImagesConfig _productImagesConfig;
     private readonly IRepository<Order> _orderRepository;
+    private readonly IWebHostEnvironment _env;
     private readonly StripeConfig _stripeConfig;
+    private readonly IMapper _mapper;
 
     public PaymentService(
         IRepository<ProductCart> productCartRepository,
@@ -26,7 +36,11 @@ public class PaymentService : IPaymentService
         UserManager<User> userManager,
         IRepository<Order> orderRepository,
         IRepository<ProductCartItem> productCartItemRepository,
-        IRepository<User> userRepository)
+        IRepository<User> userRepository,
+        IEmailService emailService,
+        IMapper mapper,
+        IWebHostEnvironment env,
+        ProductImagesConfig productImagesConfig)
     {
         _productCartRepository = productCartRepository;
         _stripeConfig = stripeConfig;
@@ -34,6 +48,10 @@ public class PaymentService : IPaymentService
         _orderRepository = orderRepository;
         _productCartItemRepository = productCartItemRepository;
         _userRepository = userRepository;
+        _emailService = emailService;
+        _mapper = mapper;
+        _env = env;
+        _productImagesConfig = productImagesConfig;
     }
 
     public async Task<string> Checkout(Guid userId, PaymentRequest request)
@@ -63,7 +81,7 @@ public class PaymentService : IPaymentService
                     Currency = _stripeConfig.Currency,
                     ProductData = new SessionLineItemPriceDataProductDataOptions
                     {
-                        Name = item.Product.Id.ToString(),
+                        Name = item.Product.Name,
                     },
                 },
                 Quantity = item.Quantity,
@@ -133,9 +151,27 @@ public class PaymentService : IPaymentService
 
         if (result)
         {
+            await SendOrderMessageAsync(user, productCart);
             productCart.TotalPrice = 0;
             await _productCartItemRepository.DeleteManyAsync(productCart.ProductCartItems);
         }
+
+        return result;
+    }
+
+    private async Task<bool> SendOrderMessageAsync(User user, ProductCart productCart)
+    {
+        var products = productCart.ProductCartItems.Select(x => _mapper.Map<ProductDTO>(x.Product)).ToList();
+
+        foreach (var product in products)
+            product.ImagesPath = _env.ContentRootPath.GetImagePath(product, _productImagesConfig);
+
+        var result = await _emailService.SendAsync(new OrderMessage
+        {
+            Recipient = user.Email!,
+            Products = products,
+            TotalPrice = productCart.TotalPrice
+        });
 
         return result;
     }
