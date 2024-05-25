@@ -163,9 +163,6 @@ public class PaymentService : IPaymentService
     {
         var products = productCart.ProductCartItems.Select(x => _mapper.Map<ProductDTO>(x.Product)).ToList();
 
-        foreach (var product in products)
-            product.ImagesPath = _env.ContentRootPath.GetImagePath(product, _productImagesConfig);
-
         var result = await _emailService.SendAsync(new OrderMessage
         {
             Recipient = user.Email!,
