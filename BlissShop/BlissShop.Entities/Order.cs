@@ -13,6 +13,7 @@ public class Order : EntityBase
     public Guid AddressId { get; set; }
     public int Quantity { get; set; }
     public bool IsPaid { get; set; }
+    public DateTime CreateAt { get; set; }
     
     public Address Address { get; set; } = null!;
     public User User { get; set; } = null!;

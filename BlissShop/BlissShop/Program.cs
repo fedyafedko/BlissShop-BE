@@ -54,7 +54,6 @@ builder.Services.AddControllers(options => options
     .Conventions
     .Add(new RouteTokenTransformerConvention(new SlugifyParameterTransformer())));
 
-
 // DbContext
 builder.Services.AddDbContext<ApplicationDbContext>(opt =>
     opt.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection")));
@@ -74,7 +73,7 @@ builder.Services.AddScoped<IUserService, UserService>();
 builder.Services.AddScoped<IShopService, ShopService>();
 builder.Services.AddScoped<IProductService, BlissShop.BLL.Services.ProductService>();
 builder.Services.AddScoped<IProductCartService, ProductCartService>();
-builder.Services.AddScoped<IPaymentService, PaymentService>();
+builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
