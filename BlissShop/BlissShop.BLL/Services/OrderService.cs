@@ -2,9 +2,9 @@
 using BlissShop.Abstraction;
 using BlissShop.Abstraction.FluentEmail;
 using BlissShop.Common.Configs;
+using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Exceptions;
-using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
@@ -17,20 +17,18 @@ using Stripe.Checkout;
 
 namespace BlissShop.BLL.Services;
 
-public class PaymentService : IPaymentService
+public class OrderService : IOrderService
 {
     private readonly UserManager<User> _userManager;
     private readonly IEmailService _emailService;
     private readonly IRepository<User> _userRepository;
     private readonly IRepository<ProductCart> _productCartRepository;
     private readonly IRepository<ProductCartItem> _productCartItemRepository;
-    private readonly ProductImagesConfig _productImagesConfig;
     private readonly IRepository<Order> _orderRepository;
-    private readonly IWebHostEnvironment _env;
     private readonly StripeConfig _stripeConfig;
     private readonly IMapper _mapper;
 
-    public PaymentService(
+    public OrderService(
         IRepository<ProductCart> productCartRepository,
         StripeConfig stripeConfig,
         UserManager<User> userManager,
@@ -50,8 +48,6 @@ public class PaymentService : IPaymentService
         _userRepository = userRepository;
         _emailService = emailService;
         _mapper = mapper;
-        _env = env;
-        _productImagesConfig = productImagesConfig;
     }
 
     public async Task<string> Checkout(Guid userId, PaymentRequest request)
@@ -112,6 +108,29 @@ public class PaymentService : IPaymentService
         return session.Url;
     }
 
+    public async Task<OrderDTO> GetOrderAsync(Guid orderId)
+    {
+        var order = await _orderRepository
+            .Include(x => x.Product)
+            .Include(x => x.Address)
+            .FirstOrDefaultAsync(x => x.Id == orderId)
+            ?? throw new NotFoundException("Order not found");
+
+        return _mapper.Map<OrderDTO>(order);
+    }
+
+    public async Task<List<OrderDTO>> GetOrdersForUserAsync(Guid userId)
+    {
+        var orders = await _orderRepository
+            .Include(x => x.Product)
+            .Include(x => x.Address)
+            .Where(x => x.BuyerId == userId)
+            .Select(x => x)
+            .ToListAsync();
+
+        return _mapper.Map<List<OrderDTO>>(orders);
+    }
+
     public async Task<bool> HandleWebhook(Event stripeEvent)
     {
         var session = stripeEvent.Type == Events.CheckoutSessionCompleted
@@ -143,7 +162,8 @@ public class PaymentService : IPaymentService
                 ProductId = item.ProductId,
                 AddressId = addressId,
                 Quantity = item.Quantity,
-                IsPaid = true
+                IsPaid = true,
+                CreateAt = DateTime.Now
             });
         }
 

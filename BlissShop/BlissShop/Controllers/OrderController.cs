@@ -9,22 +9,22 @@ namespace BlissShop.Controllers;
 
 [ApiController]
 [Route("api/[controller]")]
-public class PaymentController : ControllerBase
+public class OrderController : ControllerBase
 {
-    private readonly IPaymentService _paymentService;
+    private readonly IOrderService _orderService;
     private readonly StripeConfig _stripeConfig;
 
-    public PaymentController(StripeConfig stripeConfig, IPaymentService paymentService)
+    public OrderController(StripeConfig stripeConfig, IOrderService orderService)
     {
         _stripeConfig = stripeConfig;
-        _paymentService = paymentService;
+        _orderService = orderService;
     }
 
-    [HttpPost]
+    [HttpPost("[action]")]
     public async Task<IActionResult> CheckOut(PaymentRequest request)
     {
         var userId = HttpContext.GetUserId();
-        var result = await _paymentService.Checkout(userId, request);
+        var result = await _orderService.Checkout(userId, request);
         return Ok(result);
     }
 
@@ -37,8 +37,23 @@ public class PaymentController : ControllerBase
             Request.Headers["Stripe-Signature"],
             _stripeConfig.WebhookSecret);
 
-        var result = await _paymentService.HandleWebhook(stripeEvent);
+        var result = await _orderService.HandleWebhook(stripeEvent);
 
+        return Ok(result);
+    }
+
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetOrdersForUser()
+    {
+        var userId = HttpContext.GetUserId();
+        var result = await _orderService.GetOrdersForUserAsync(userId);
+        return Ok(result);
+    }
+
+    [HttpGet("[action]")]
+    public async Task<IActionResult> GetOrder(Guid orderId)
+    {
+        var result = await _orderService.GetOrderAsync(orderId);
         return Ok(result);
     }
 }
