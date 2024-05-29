@@ -1,12 +1,14 @@
 ﻿using BlissShop.Abstraction.Product;
 using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Extensions;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace BlissShop.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [Authorize]
     public class ProductCartController : ControllerBase
     {
         private readonly IProductCartService _productCartService;
@@ -31,7 +33,7 @@ namespace BlissShop.Controllers
             var userId = HttpContext.GetUserId();
             var result = await _productCartService.AddToProductCart(userId, dto);
 
-            return Ok(result);
+            return result ? Ok() : BadRequest();
         }
 
         [HttpDelete]
@@ -40,7 +42,7 @@ namespace BlissShop.Controllers
             var userId = HttpContext.GetUserId();
             var result = await _productCartService.RemoveFromProductCart(userId, productId);
 
-            return Ok(result);
+            return result ? NoContent() : NotFound();
         }
     }
 }

@@ -21,6 +21,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpPost("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> AddProductAsync(CreateProductDTO dto)
         {
             var sellerId = HttpContext.GetUserId();
@@ -30,6 +31,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpDelete("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> DeleteProductAsync(Guid id)
         {
             var sellerId = HttpContext.GetUserId();
@@ -39,6 +41,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpPut("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> UpdateProductAsync(Guid productId, UpdateProductDTO dto)
         {
             var sellerId = HttpContext.GetUserId();
@@ -64,6 +67,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpPost("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> UploadImagesAsync(UploadProductImageRequest request)
         {
             var userId = HttpContext.GetUserId();
@@ -73,6 +77,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpDelete("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> DeleteImagesAsync(DeleteProductImageRequest request)
         {
             var userId = HttpContext.GetUserId();

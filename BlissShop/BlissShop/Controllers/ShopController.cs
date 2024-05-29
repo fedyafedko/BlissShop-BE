@@ -9,7 +9,6 @@ namespace BlissShop.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
-    [Authorize]
     public class ShopController : ControllerBase
     {
         private readonly IShopService _shopService;
@@ -20,6 +19,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpPost("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> AddShopAsync(CreateShopDTO dto)
         {
             var userId = HttpContext.GetUserId();
@@ -29,6 +29,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpDelete("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> DeleteShopAsync(Guid id)
         {
             var sellerId = HttpContext.GetUserId();
@@ -46,6 +47,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpGet("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> GetShopsForSellerAsync()
         {
             var userId = HttpContext.GetUserId();
@@ -55,6 +57,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpPut("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> UpdateShopAsync(Guid shopId, UpdateShopDTO dto)
         {
             var result = await _shopService.UpdateShopAsync(shopId, dto);
@@ -63,6 +66,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpPost("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> UploadAvatarAsync(UploadShopAvatarRequest request)
         {
             var userId = HttpContext.GetUserId();
@@ -72,6 +76,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpDelete("[action]")]
+        [Authorize(Roles = "Seller")]
         public async Task<IActionResult> DeleteAvatarAsync(DeleteShopAvatarRequest request)
         {
             var userId = HttpContext.GetUserId();
@@ -86,10 +91,11 @@ namespace BlissShop.Controllers
         {
             var result = await _shopService.AprovedShopAsync(shopId, isAproved);
 
-            return Ok(result);
+            return result ? Ok() : BadRequest();
         }
 
         [HttpPost("[action]")]
+        [Authorize]
         public async Task<IActionResult> Follow(Guid shopId)
         {
             var userId = HttpContext.GetUserId();
@@ -99,6 +105,7 @@ namespace BlissShop.Controllers
         }
 
         [HttpDelete("[action]")]
+        [Authorize]
         public async Task<IActionResult> Unfollow(Guid shopId)
         {
             var userId = HttpContext.GetUserId();

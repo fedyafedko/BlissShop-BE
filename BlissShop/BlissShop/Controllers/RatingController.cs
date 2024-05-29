@@ -17,8 +17,8 @@ public class RatingController : ControllerBase
         _ratingService = ratingService;
     }
 
-    [Authorize]
     [HttpPost]
+    [Authorize]
     public async Task<IActionResult> AddRating(CreateRatingDTO dto)
     {
         var userId = HttpContext.GetUserId();
@@ -35,8 +35,8 @@ public class RatingController : ControllerBase
         return Ok(result);
     }
 
-    [Authorize]
     [HttpGet("[action]")]
+    [Authorize]
     public async Task<IActionResult> GetRatingForUser()
     {
         var userId = HttpContext.GetUserId();

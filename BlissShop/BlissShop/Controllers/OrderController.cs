@@ -4,6 +4,7 @@ using BlissShop.Common.Configs;
 using BlissShop.Abstraction;
 using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests;
+using Microsoft.AspNetCore.Authorization;
 
 namespace BlissShop.Controllers;
 
@@ -21,6 +22,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpPost("[action]")]
+    [Authorize]
     public async Task<IActionResult> CheckOut(PaymentRequest request)
     {
         var userId = HttpContext.GetUserId();
@@ -43,6 +45,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet("[action]")]
+    [Authorize]
     public async Task<IActionResult> GetOrdersForUser()
     {
         var userId = HttpContext.GetUserId();
@@ -51,6 +54,7 @@ public class OrderController : ControllerBase
     }
 
     [HttpGet("[action]")]
+    [Authorize]
     public async Task<IActionResult> GetOrder(Guid orderId)
     {
         var result = await _orderService.GetOrderAsync(orderId);
