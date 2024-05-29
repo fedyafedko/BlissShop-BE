@@ -17,5 +17,3 @@ public class SupportRequestValidator : AbstractValidator<SupportRequest>
             .WithMessage("Your message is empty");
     }
 }
-{
-}
