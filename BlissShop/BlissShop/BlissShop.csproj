@@ -36,6 +36,7 @@
 
   <ItemGroup>
     <Folder Include="Uploads\Avatars\" />
+    <Folder Include="Uploads\Categories\" />
     <Folder Include="Uploads\Shops\" />
   </ItemGroup>
 

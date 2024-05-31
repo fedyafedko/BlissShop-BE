@@ -1,6 +1,6 @@
 ﻿namespace BlissShop.Common.Configs;
 
-public class ShopAvatarConfig : ConfigBase
+public class CategoryAvatarConfig : ConfigBase
 {
     public string Folder { get; set; } = string.Empty;
     public List<string> FileExtensions { get; set; } = null!;

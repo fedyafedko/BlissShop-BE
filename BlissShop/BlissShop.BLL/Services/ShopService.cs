@@ -142,8 +142,8 @@ public class ShopService : IShopService
         if (shop.SellerId != userId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
-        var contetntPath = _env.ContentRootPath;
-        var path = Path.Combine(contetntPath, _shopAvatarConfig.Folder, request.ShopId.ToString());
+        var contentPath = _env.ContentRootPath;
+        var path = Path.Combine(contentPath, _shopAvatarConfig.Folder, request.ShopId.ToString());
 
         if (!Directory.Exists(path))
             Directory.CreateDirectory(path);

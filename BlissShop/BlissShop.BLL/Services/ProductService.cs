@@ -21,6 +21,7 @@ public class ProductService : IProductService
 {
     private readonly IRepository<ShopFollower> _followerRepository;
     private readonly IRepository<Product> _productRepository;
+    private readonly IRepository<Category> _categoryRepository;
     private readonly IRepository<Shop> _shopRepository;
     private readonly IEmailService _emailService;
     private readonly ProductImagesConfig _productImagesConfig;
@@ -38,7 +39,8 @@ public class ProductService : IProductService
         ProductImagesConfig productImagesConfig,
         IWebHostEnvironment env,
         IEmailService emailService,
-        CallbackUrisConfig callbackUrisConfig)
+        CallbackUrisConfig callbackUrisConfig,
+        IRepository<Category> categoryRepository)
     {
         _followerRepository = followerRepository;
         _productRepository = productRepository;
@@ -49,6 +51,7 @@ public class ProductService : IProductService
         _env = env;
         _emailService = emailService;
         _callbackUrisConfig = callbackUrisConfig;
+        _categoryRepository = categoryRepository;
     }
 
     public async Task<ProductDTO> AddProductAsync(Guid sellerId, CreateProductDTO dto)
@@ -118,6 +121,26 @@ public class ProductService : IProductService
     {
         var query = _productRepository.Where(x => x.ShopId == shopId);
         var products = await query.ToListAsync();
+
+        var result = _mapper.Map<List<ProductDTO>>(products);
+
+        foreach (var product in result)
+        {
+            product.ImagesPath = _env.ContentRootPath.GetImagePath(product, _productImagesConfig);
+        }
+
+        return result;
+    }
+
+    public async Task<List<ProductDTO>> GetProductForCategoryAsync(Guid categoryId)
+    {
+        var category = await _categoryRepository.FirstOrDefaultAsync(x => x.Id == categoryId)
+            ?? throw new NotFoundException($"Category not found with such id: {categoryId}");
+
+        var products = await _productRepository
+            .Include(x => x.Shop)
+            .Where(x => x.CategoryId == categoryId)
+            .ToListAsync();
 
         var result = _mapper.Map<List<ProductDTO>>(products);
 
