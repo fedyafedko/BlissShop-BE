@@ -45,6 +45,7 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<ShopAvatarConfig>()
        .AddConfig<ProductImagesConfig>()
        .AddConfig<StripeConfig>()
+       .AddConfig<CategoryAvatarConfig>()
        .AddConfig<AuthConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
@@ -77,6 +78,7 @@ builder.Services.AddScoped<IOrderService, OrderService>();
 builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
+builder.Services.AddScoped<ICategoryService, CategoryService>();
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()

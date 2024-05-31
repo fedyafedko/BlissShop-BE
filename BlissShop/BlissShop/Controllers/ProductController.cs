@@ -22,7 +22,7 @@ namespace BlissShop.Controllers
 
         [HttpPost("[action]")]
         [Authorize(Roles = "Seller")]
-        public async Task<IActionResult> AddProductAsync(CreateProductDTO dto)
+        public async Task<IActionResult> AddProductAsync([FromBody] CreateProductDTO dto)
         {
             var sellerId = HttpContext.GetUserId();
             var result = await _productService.AddProductAsync(sellerId, dto);
@@ -59,9 +59,17 @@ namespace BlissShop.Controllers
         }
 
         [HttpGet("[action]")]
-        public async Task<IActionResult> GetProductsForShopAsync(Guid shopId)
+        public async Task<IActionResult> GetProductsForShop(Guid shopId)
         {
             var result = await _productService.GetProductsForShopAsync(shopId);
+
+            return Ok(result);
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetProductsForCategory(Guid categoryId)
+        {
+            var result = await _productService.GetProductForCategoryAsync(categoryId);
 
             return Ok(result);
         }

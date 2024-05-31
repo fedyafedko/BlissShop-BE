@@ -15,4 +15,5 @@ public interface IProductService
     Task<ProductImagesResponse> UploadImagesAsync(Guid userId, UploadProductImageRequest request);
     Task<bool> DeleteImagesAsync(Guid userId, DeleteProductImageRequest request);
     Task<PageList<ProductDTO>> SearchProductAsync(SearchProductRequest request);
+    Task<List<ProductDTO>> GetProductForCategoryAsync(Guid categoryId);
 }
