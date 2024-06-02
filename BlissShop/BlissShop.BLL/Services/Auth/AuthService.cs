@@ -5,6 +5,7 @@ using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.Exceptions;
 using BlissShop.Common.Extentions;
 using BlissShop.Common.Responses;
+using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using BlissShop.FluentEmail.MessageBase;
 using Microsoft.AspNetCore.Identity;
@@ -14,12 +15,13 @@ namespace BlissShop.BLL.Services.Auth;
 
 public class AuthService : IAuthService
 {
-    public readonly UserManager<User> _userManager;
-    public readonly IEmailConfirmationService _emailConfirmationService;
-    public readonly ITokenService _tokenService;
+    private readonly UserManager<User> _userManager;
+    private readonly IRepository<Setting> _settingRepository;
+    private readonly IEmailConfirmationService _emailConfirmationService;
+    private readonly ITokenService _tokenService;
     private readonly IEmailService _emailService;
-    public readonly ILogger<AuthService> _logger;
-    public readonly IMapper _mapper;
+    private readonly ILogger<AuthService> _logger;
+    private readonly IMapper _mapper;
 
     public AuthService(
         UserManager<User> userManager,
@@ -27,7 +29,8 @@ public class AuthService : IAuthService
         ILogger<AuthService> logger,
         IMapper mapper,
         IEmailConfirmationService emailConfirmationService,
-        IEmailService emailService)
+        IEmailService emailService,
+        IRepository<Setting> settingRepository)
     {
         _userManager = userManager;
         _tokenService = tokenService;
@@ -35,6 +38,7 @@ public class AuthService : IAuthService
         _mapper = mapper;
         _emailConfirmationService = emailConfirmationService;
         _emailService = emailService;
+        _settingRepository = settingRepository;
     }
     public async Task<RegisterResponse> SignUpAsync(SignUpDTO dto)
     {
@@ -63,6 +67,10 @@ public class AuthService : IAuthService
             _logger.LogError($"Failed to add user to role. Role: {role}");
             throw new UserManagerException($"User manager operation failed:\n", result.Errors);
         }
+
+        var setting = new Setting { UserId = user.Id };
+
+        await _settingRepository.InsertAsync(setting);
 
         var generatedCode = await _emailConfirmationService.GenerateEmailCodeAsync(user.Id);
 

@@ -15,5 +15,6 @@ public class User : IdentityUser<Guid>
     public List<Order> Orders { get; set; } = null!;
     public List<Address> Addresses { get; set; } = null!;
     public ProductCart ProductCart { get; set; } = null!;
+    public Setting Setting { get; set; } = null!;
     public List<Rating> Ratings { get; set; } = null!;
 }

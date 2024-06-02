@@ -1,4 +1,5 @@
-﻿using BlissShop.Common.DTO.User;
+﻿using BlissShop.Common.DTO.Settings;
+using BlissShop.Common.DTO.User;
 using BlissShop.Common.Requests;
 using BlissShop.Common.Responses;
 using Microsoft.AspNetCore.Http;

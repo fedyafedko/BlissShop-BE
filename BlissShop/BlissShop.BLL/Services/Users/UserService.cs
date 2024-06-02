@@ -1,15 +1,18 @@
 ﻿using AutoMapper;
 using BlissShop.Abstraction.Users;
 using BlissShop.Common.Configs;
+using BlissShop.Common.DTO.Settings;
 using BlissShop.Common.DTO.User;
 using BlissShop.Common.Exceptions;
 using BlissShop.Common.Extentions;
 using BlissShop.Common.Requests;
 using BlissShop.Common.Responses;
+using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
