@@ -239,10 +239,17 @@ public class ProductService : IProductService
     
     private async Task<bool> SendMessagesForFollowersAsync(Guid shopId, ProductDTO product)
     {
-        var followers = await _followerRepository.Include(x => x.User).Where(x => x.ShopId == shopId).ToListAsync();
+        var followers = await _followerRepository
+            .Include(x => x.User)
+            .ThenInclude(x => x.Setting)
+            .Where(x => x.ShopId == shopId)
+            .ToListAsync();
 
         //ToDo: Send messages to followers with settings
-        var emails = followers.Select(x => x.User.Email).ToList();
+        var emails = followers
+            .Where(x => x.User.Setting.IsEmailNotification)
+            .Select(x => x.User.Email)
+            .ToList();
 
         var messages = new List<NewProductMessage>();
 

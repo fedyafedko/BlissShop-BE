@@ -17,6 +17,7 @@ public class ApplicationDbContext : IdentityDbContext<User, IdentityRole<Guid>, 
     public DbSet<ShopFollower> ShopFollowers { get; set; } = null!;
     public DbSet<Rating> Ratings { get; set; } = null!;
     public DbSet<Category> Categories { get; set; } = null!;
+    public DbSet<Setting> Settings { get; set; } = null!;
 
     public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options) { }
 

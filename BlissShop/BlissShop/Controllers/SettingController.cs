@@ -1,4 +1,6 @@
 ﻿using BlissShop.Abstraction;
+using BlissShop.Common.DTO.Settings;
+using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests;
 using Microsoft.AspNetCore.Mvc;
 
@@ -21,6 +23,24 @@ namespace BlissShop.Controllers
             var result = await _settingService.SendEmailSupport(request);
 
             return result ? Ok() : BadRequest();
+        }
+
+        [HttpPut("[action]")]
+        public async Task<IActionResult> UpdateSettings(UpdateSettingDTO dto)
+        {
+            var userId = HttpContext.GetUserId();
+            var result = await _settingService.UpdateSettingsAsync(userId, dto);
+
+            return result ? Ok() : BadRequest();
+        }
+
+        [HttpGet("[action]")]
+        public async Task<IActionResult> GetSettings()
+        {
+            var userId = HttpContext.GetUserId();
+            var result = await _settingService.GetSettingsForUserAsync(userId);
+
+            return Ok(result);
         }
     }
 }
