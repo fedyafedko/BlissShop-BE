@@ -16,13 +16,13 @@ public class RefreshTokenService : IRefreshTokenService
     private readonly ITokenService _tokenService;
 
     public RefreshTokenService(
+        TokenValidationParameters tokenValidationParameters,
         UserManager<User> userManager,
-        ITokenService tokenService,
-        TokenValidationParameters tokenValidationParameters)
+        ITokenService tokenService)
     {
-        _tokenService = tokenService;
-        _userManager = userManager;
         _tokenValidationParameters = tokenValidationParameters;
+        _userManager = userManager;
+        _tokenService = tokenService;
     }
     public async Task<AuthSuccessDTO> RefreshTokenAsync(RefreshTokenDTO dto)
     {

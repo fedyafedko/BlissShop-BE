@@ -9,7 +9,6 @@ using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using BlissShop.FluentEmail.MessageBase;
-using LanguageExt.Pipes;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
@@ -20,36 +19,36 @@ namespace BlissShop.BLL.Services;
 
 public class ShopService : IShopService
 {
-    private readonly UserManager<User> _userManager;
+    private readonly IRepository<ShopFollower> _shopFollowerRepository;
     private readonly IRepository<Shop> _shopRepository;
+    private readonly UserManager<User> _userManager;
     private readonly ShopAvatarConfig _shopAvatarConfig;
     private readonly CallbackUrisConfig _callbackUrisConfig;
-    private readonly IRepository<ShopFollower> _shopFollowerRepository;
     private readonly IEmailService _emailService;
-    private readonly ILogger<ShopService> _logger;
     private readonly IWebHostEnvironment _env;
+    private readonly ILogger<ShopService> _logger;
     private readonly IMapper _mapper;
 
     public ShopService(
-        UserManager<User> userManager,
+        IRepository<ShopFollower> shopFollowerRepository,
         IRepository<Shop> shopRepository,
+        UserManager<User> userManager,
         ShopAvatarConfig shopAvatarConfig,
-        IEmailService emailService,
-        ILogger<ShopService> logger,
-        IWebHostEnvironment env,
-        IMapper mapper,
         CallbackUrisConfig callbackUrisConfig,
-        IRepository<ShopFollower> shopFollowerRepository)
+        IEmailService emailService,
+        IWebHostEnvironment env,
+        ILogger<ShopService> logger,
+        IMapper mapper)
     {
-        _userManager = userManager;
-        _shopRepository = shopRepository;
-        _shopAvatarConfig = shopAvatarConfig;
-        _emailService = emailService;
-        _logger = logger;
-        _env = env;
-        _mapper = mapper;
-        _callbackUrisConfig = callbackUrisConfig;
         _shopFollowerRepository = shopFollowerRepository;
+        _shopRepository = shopRepository;
+        _userManager = userManager;
+        _shopAvatarConfig = shopAvatarConfig;
+        _callbackUrisConfig = callbackUrisConfig;
+        _emailService = emailService;
+        _env = env;
+        _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<ShopDTO> AddShopAsync(Guid userId, CreateShopDTO dto)
@@ -200,7 +199,7 @@ public class ShopService : IShopService
         return true;
     }
 
-    public async Task<bool> AprovedShopAsync(Guid shopId, bool isAproved)
+    public async Task<bool> ApprovedShopAsync(Guid shopId, bool isAproved)
     {
         var shop = await _shopRepository
             .Include(x => x.User)

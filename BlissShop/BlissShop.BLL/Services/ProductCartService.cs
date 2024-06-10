@@ -16,33 +16,33 @@ namespace BlissShop.BLL.Services;
 
 public class ProductCartService : IProductCartService
 {
-    private readonly IRepository<ProductCart> _productCartRepository;
     private readonly IRepository<ProductCartItem> _productCartItemsRepository;
+    private readonly IRepository<ProductCart> _productCartRepository;
     private readonly IRepository<Product> _productRepository;
-    private readonly UserManager<User> _userManager;
-    private readonly ILogger<ProductCartService> _logger;
     private readonly ProductImagesConfig _productImagesConfig;
+    private readonly UserManager<User> _userManager;
     private readonly IWebHostEnvironment _env;
+    private readonly ILogger<ProductCartService> _logger;
     private readonly IMapper _mapper;
 
     public ProductCartService(
-        IRepository<ProductCart> productCartRepository,
         IRepository<ProductCartItem> productCartItemsRepository,
+        IRepository<ProductCart> productCartRepository,
         IRepository<Product> productRepository,
+        ProductImagesConfig productImagesConfig,
         UserManager<User> userManager,
-        ILogger<ProductCartService> logger,
-        IMapper mapper,
         IWebHostEnvironment env,
-        ProductImagesConfig productImagesConfig)
+        ILogger<ProductCartService> logger,
+        IMapper mapper)
     {
-        _productCartRepository = productCartRepository;
         _productCartItemsRepository = productCartItemsRepository;
+        _productCartRepository = productCartRepository;
         _productRepository = productRepository;
+        _productImagesConfig = productImagesConfig;
         _userManager = userManager;
+        _env = env;
         _logger = logger;
         _mapper = mapper;
-        _env = env;
-        _productImagesConfig = productImagesConfig;
     }
 
     public async Task<bool> AddToProductCart(Guid userId, AddProductCartDTO dto)

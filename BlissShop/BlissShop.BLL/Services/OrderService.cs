@@ -19,34 +19,32 @@ namespace BlissShop.BLL.Services;
 
 public class OrderService : IOrderService
 {
+    private readonly IRepository<ProductCartItem> _productCartItemRepository;
+    private readonly IRepository<ProductCart> _productCartRepository;
+    private readonly IRepository<Order> _orderRepository;
+    private readonly IRepository<User> _userRepository;
     private readonly UserManager<User> _userManager;
     private readonly IEmailService _emailService;
-    private readonly IRepository<User> _userRepository;
-    private readonly IRepository<ProductCart> _productCartRepository;
-    private readonly IRepository<ProductCartItem> _productCartItemRepository;
-    private readonly IRepository<Order> _orderRepository;
     private readonly StripeConfig _stripeConfig;
     private readonly IMapper _mapper;
 
     public OrderService(
-        IRepository<ProductCart> productCartRepository,
-        StripeConfig stripeConfig,
-        UserManager<User> userManager,
-        IRepository<Order> orderRepository,
         IRepository<ProductCartItem> productCartItemRepository,
+        IRepository<ProductCart> productCartRepository,
+        IRepository<Order> orderRepository,
         IRepository<User> userRepository,
+        UserManager<User> userManager,
         IEmailService emailService,
-        IMapper mapper,
-        IWebHostEnvironment env,
-        ProductImagesConfig productImagesConfig)
+        StripeConfig stripeConfig,
+        IMapper mapper)
     {
-        _productCartRepository = productCartRepository;
-        _stripeConfig = stripeConfig;
-        _userManager = userManager;
-        _orderRepository = orderRepository;
         _productCartItemRepository = productCartItemRepository;
+        _productCartRepository = productCartRepository;
+        _orderRepository = orderRepository;
         _userRepository = userRepository;
+        _userManager = userManager;
         _emailService = emailService;
+        _stripeConfig = stripeConfig;
         _mapper = mapper;
     }
 

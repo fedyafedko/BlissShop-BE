@@ -18,17 +18,17 @@ namespace BlissShop.BLL.Services.Auth;
 
 public class TokenService : ITokenService
 {
-    private readonly JwtConfig _jwtConfig;
     private readonly UserManager<User> _userManager;
+    private readonly JwtConfig _jwtConfig;
     private readonly ILogger<AuthService> _logger;
 
     public TokenService(
-        JwtConfig jwtConfig,
         UserManager<User> userManager,
+        JwtConfig jwtConfig,
         ILogger<AuthService> logger)
     {
-        _jwtConfig = jwtConfig;
         _userManager = userManager;
+        _jwtConfig = jwtConfig;
         _logger = logger;
     }
 

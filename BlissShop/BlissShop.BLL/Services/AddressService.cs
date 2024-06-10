@@ -20,13 +20,13 @@ public class AddressService : IAddressService
     public AddressService(
         IRepository<Address> addressRepository,
         UserManager<User> userManager,
-        IMapper mapper,
-        ILogger<AddressService> logger)
+        ILogger<AddressService> logger,
+        IMapper mapper)
     {
         _addressRepository = addressRepository;
         _userManager = userManager;
-        _mapper = mapper;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<AddressDTO> CreateAddressAsync(Guid userId, CreateAddressDTO dto)

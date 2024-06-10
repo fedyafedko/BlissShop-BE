@@ -17,7 +17,14 @@ namespace BlissShop.Controllers
             _settingService = settingService;
         }
 
+        /// <summary>
+        /// Send email support.
+        /// </summary>
+        /// <param name="request"></param>
+        /// <returns> This endpoint returns a status code.</returns>
         [HttpPost("[action]")]
+        [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SendEmailSupport(SupportRequest request)
         {
             var result = await _settingService.SendEmailSupport(request);
@@ -25,7 +32,14 @@ namespace BlissShop.Controllers
             return result ? Ok() : BadRequest();
         }
 
+        /// <summary>
+        /// Update settings.
+        /// </summary>
+        /// <param name="dto"></param>
+        /// <returns> This endpoint returns a status code.</returns>
         [HttpPut("[action]")]
+        [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> UpdateSettings(UpdateSettingDTO dto)
         {
             var userId = HttpContext.GetUserId();
@@ -34,7 +48,13 @@ namespace BlissShop.Controllers
             return result ? Ok() : BadRequest();
         }
 
+        /// <summary>
+        /// Get settings for user.
+        /// </summary>
+        /// <returns> This endpoint returns settings.</returns>
         [HttpGet("[action]")]
+        [ProducesResponseType(typeof(SettingDTO), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
         public async Task<IActionResult> GetSettings()
         {
             var userId = HttpContext.GetUserId();

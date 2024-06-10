@@ -12,14 +12,17 @@ using Microsoft.EntityFrameworkCore;
 namespace BlissShop.BLL.Services;
 public class SettingService : ISettingService
 {
-    private readonly IEmailService _emailService;
     private readonly IRepository<Setting> _settingRepository;
+    private readonly IEmailService _emailService;
     private readonly IMapper _mapper;
 
-    public SettingService(IEmailService emailService, IRepository<Setting> settingRepository, IMapper mapper)
+    public SettingService(
+        IRepository<Setting> settingRepository,
+        IEmailService emailService,
+        IMapper mapper)
     {
-        _emailService = emailService;
         _settingRepository = settingRepository;
+        _emailService = emailService;
         _mapper = mapper;
     }
 
