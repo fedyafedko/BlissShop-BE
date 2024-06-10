@@ -38,14 +38,14 @@ public class UserController : ControllerBase
     /// <summary>
     /// Delete an avatar for user.
     /// </summary>
-    /// <param name="avatar"></param>
     /// <returns> This endpoint returns a status code.</returns>
     [HttpDelete("[action]")]
     [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
-    public async Task<IActionResult> DeleteAvatar(string avatar)
+    public IActionResult DeleteAvatar()
     {
-        var result = await _userService.DeleteAvatarAsync(avatar);
+        var userId = HttpContext.GetUserId();
+        var result = _userService.DeleteAvatarAsync(userId);
         return result ? NoContent() : NotFound();
     }
 
