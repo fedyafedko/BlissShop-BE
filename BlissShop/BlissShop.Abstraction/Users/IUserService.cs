@@ -9,7 +9,7 @@ namespace BlissShop.Abstraction.Users;
 public interface IUserService
 {
     Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar);
-    Task<bool> DeleteAvatarAsync(string avatar);
+    bool DeleteAvatarAsync(Guid userId);
     Task<UserDTO> Me(Guid userId);
     Task<bool> ChangePasswordAsync(Guid userId, ChangePasswordRequest request);
     Task<UserDTO> EditProfile(Guid userId, UpdateUserDTO dto);

@@ -78,15 +78,22 @@ public class UserService : IUserService
 
         return result;
     }
-    public async Task<bool> DeleteAvatarAsync(string avatar)
+    public bool DeleteAvatarAsync(Guid userId)
     {
         var wwwPath = _env.ContentRootPath;
-        var path = Path.Combine(wwwPath, _userAvatarConfig.Folder, avatar);
+        var path = Path.Combine(wwwPath, _userAvatarConfig.Folder, userId.ToString());
 
-        if (!File.Exists(path))
+        var file = Directory.GetFiles(path).FirstOrDefault(x => x.Contains(userId.ToString()));
+
+        if (!Directory.Exists(path))
             throw new NotFoundException("File not found");
 
-        await Task.Run(() => File.Delete(path));
+        var avatar = Directory.GetFiles(path).FirstOrDefault();
+
+        if (string.IsNullOrEmpty(avatar))
+            throw new NotFoundException("File not found");
+
+        File.Delete(avatar);
 
         return true;
     }
