@@ -12,21 +12,21 @@ namespace BlissShop.BLL.Services.Auth;
 
 public class EmailConfirmationService : IEmailConfirmationService
 {
-    private readonly ITokenService _tokenService;
-    private readonly UserManager<User> _userManager;
     private readonly IRepository<UserRegister> _userRegisterRepository;
+    private readonly UserManager<User> _userManager;
+    private readonly ITokenService _tokenService;
     private readonly AuthConfig _authConfig;
 
     public EmailConfirmationService(
-        UserManager<User> userManager,
         IRepository<UserRegister> userRegisterRepository,
-        AuthConfig authConfig,
-        ITokenService tokenService)
+        UserManager<User> userManager,
+        ITokenService tokenService,
+        AuthConfig authConfig)
     {
-        _userManager = userManager;
         _userRegisterRepository = userRegisterRepository;
-        _authConfig = authConfig;
+        _userManager = userManager;
         _tokenService = tokenService;
+        _authConfig = authConfig;
     }
 
     public async Task<AuthSuccessDTO> ConfirmEmailAsync(ConfirmEmailDTO dto)

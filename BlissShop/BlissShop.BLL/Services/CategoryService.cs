@@ -16,23 +16,23 @@ namespace BlissShop.BLL.Services;
 public class CategoryService : ICategoryService
 {
     private readonly IRepository<Category> _categoryRepository;
-    private readonly IMapper _mapper;
-    private readonly IWebHostEnvironment _env;
     private readonly CategoryAvatarConfig _categoryAvatarConfig;
+    private readonly IWebHostEnvironment _env;
     private readonly ILogger<CategoryService> _logger;
+    private readonly IMapper _mapper;
 
     public CategoryService(
         IRepository<Category> categoryRepository,
-        IMapper mapper,
-        IWebHostEnvironment env,
         CategoryAvatarConfig categoryAvatarConfig,
-        ILogger<CategoryService> logger)
+        IWebHostEnvironment env,
+        ILogger<CategoryService> logger,
+        IMapper mapper)
     {
         _categoryRepository = categoryRepository;
-        _mapper = mapper;
-        _env = env;
         _categoryAvatarConfig = categoryAvatarConfig;
+        _env = env;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<CategoryDTO> AddCategoryAsync(CreateCategoryDTO dto)

@@ -17,8 +17,15 @@ public class RatingController : ControllerBase
         _ratingService = ratingService;
     }
 
+    /// <summary>
+    /// Add rating for product.
+    /// </summary>
+    /// <param name="dto"></param>
+    /// <returns> This endpoint returns a rating.</returns>
     [HttpPost]
     [Authorize]
+    [ProducesResponseType(typeof(RatingDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> AddRating(CreateRatingDTO dto)
     {
         var userId = HttpContext.GetUserId();
@@ -27,7 +34,14 @@ public class RatingController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Get rating for product.
+    /// </summary>
+    /// <param name="productId"></param>
+    /// <returns> This endpoint returns a rating.</returns>
     [HttpGet("{productId}")]
+    [ProducesResponseType(typeof(List<RatingDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetRatingForProduct(Guid productId)
     {
         var result = await _ratingService.GetRatingForProductAsync(productId);
@@ -35,8 +49,14 @@ public class RatingController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Get rating for user.
+    /// </summary>
+    /// <returns> This endpoint returns a rating.</returns>
     [HttpGet("[action]")]
     [Authorize]
+    [ProducesResponseType(typeof(List<RatingDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> GetRatingForUser()
     {
         var userId = HttpContext.GetUserId();

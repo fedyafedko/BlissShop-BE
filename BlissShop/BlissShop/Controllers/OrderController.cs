@@ -5,6 +5,8 @@ using BlissShop.Abstraction;
 using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests;
 using Microsoft.AspNetCore.Authorization;
+using BlissShop.Common.DTO.Auth;
+using BlissShop.Common.DTO;
 
 namespace BlissShop.Controllers;
 
@@ -15,14 +17,23 @@ public class OrderController : ControllerBase
     private readonly IOrderService _orderService;
     private readonly StripeConfig _stripeConfig;
 
-    public OrderController(StripeConfig stripeConfig, IOrderService orderService)
+    public OrderController(
+        IOrderService orderService,
+        StripeConfig stripeConfig)
     {
-        _stripeConfig = stripeConfig;
         _orderService = orderService;
+        _stripeConfig = stripeConfig;
     }
 
+    /// <summary>
+    /// CheckOut for payment.
+    /// </summary>
+    /// <param name="request"></param>
+    /// <returns> This endpoint returns a status code.</returns>
     [HttpPost("[action]")]
     [Authorize]
+    [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> CheckOut(PaymentRequest request)
     {
         var userId = HttpContext.GetUserId();
@@ -30,7 +41,13 @@ public class OrderController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Web hook for insert order.
+    /// </summary>
+    /// <returns> This endpoint returns a status code.</returns>
     [HttpPost("webhook")]
+    [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> HandleWebhook() 
     { 
         var json = await new StreamReader(HttpContext.Request.Body).ReadToEndAsync();
@@ -44,8 +61,14 @@ public class OrderController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Getting orders for user.
+    /// </summary>
+    /// <returns> This endpoint returns orders.</returns>
     [HttpGet("[action]")]
     [Authorize]
+    [ProducesResponseType(typeof(List<OrderDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOrdersForUser()
     {
         var userId = HttpContext.GetUserId();
@@ -53,8 +76,15 @@ public class OrderController : ControllerBase
         return Ok(result);
     }
 
+    /// <summary>
+    /// Get order by id.
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns> This endpoint returns an order.</returns>
     [HttpGet("[action]")]
     [Authorize]
+    [ProducesResponseType(typeof(OrderDTO), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetOrder(Guid orderId)
     {
         var result = await _orderService.GetOrderAsync(orderId);

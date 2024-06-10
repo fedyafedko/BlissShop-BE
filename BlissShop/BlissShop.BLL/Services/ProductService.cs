@@ -23,35 +23,35 @@ public class ProductService : IProductService
     private readonly IRepository<Product> _productRepository;
     private readonly IRepository<Category> _categoryRepository;
     private readonly IRepository<Shop> _shopRepository;
-    private readonly IEmailService _emailService;
+    private readonly CallbackUrisConfig _callbackUrisConfig;
     private readonly ProductImagesConfig _productImagesConfig;
+    private readonly IEmailService _emailService;
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<ProductService> _logger;
     private readonly IMapper _mapper;
-    private readonly CallbackUrisConfig _callbackUrisConfig;
 
     public ProductService(
         IRepository<ShopFollower> followerRepository,
         IRepository<Product> productRepository,
         IRepository<Shop> shopRepository,
-        ILogger<ProductService> logger,
-        IMapper mapper,
-        ProductImagesConfig productImagesConfig,
-        IWebHostEnvironment env,
-        IEmailService emailService,
+        IRepository<Category> categoryRepository,
         CallbackUrisConfig callbackUrisConfig,
-        IRepository<Category> categoryRepository)
+        ProductImagesConfig productImagesConfig,
+        IEmailService emailService,
+        IWebHostEnvironment env,
+        ILogger<ProductService> logger,
+        IMapper mapper)
     {
         _followerRepository = followerRepository;
         _productRepository = productRepository;
         _shopRepository = shopRepository;
+        _categoryRepository = categoryRepository;
+        _callbackUrisConfig = callbackUrisConfig;
+        _productImagesConfig = productImagesConfig;
+        _emailService = emailService;
+        _env = env;
         _logger = logger;
         _mapper = mapper;
-        _productImagesConfig = productImagesConfig;
-        _env = env;
-        _emailService = emailService;
-        _callbackUrisConfig = callbackUrisConfig;
-        _categoryRepository = categoryRepository;
     }
 
     public async Task<ProductDTO> AddProductAsync(Guid sellerId, CreateProductDTO dto)

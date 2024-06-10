@@ -25,20 +25,20 @@ public class AuthService : IAuthService
 
     public AuthService(
         UserManager<User> userManager,
-        ITokenService tokenService,
-        ILogger<AuthService> logger,
-        IMapper mapper,
+        IRepository<Setting> settingRepository,
         IEmailConfirmationService emailConfirmationService,
+        ITokenService tokenService,
         IEmailService emailService,
-        IRepository<Setting> settingRepository)
+        ILogger<AuthService> logger,
+        IMapper mapper)
     {
         _userManager = userManager;
+        _settingRepository = settingRepository;
+        _emailConfirmationService = emailConfirmationService;
         _tokenService = tokenService;
+        _emailService = emailService;
         _logger = logger;
         _mapper = mapper;
-        _emailConfirmationService = emailConfirmationService;
-        _emailService = emailService;
-        _settingRepository = settingRepository;
     }
     public async Task<RegisterResponse> SignUpAsync(SignUpDTO dto)
     {

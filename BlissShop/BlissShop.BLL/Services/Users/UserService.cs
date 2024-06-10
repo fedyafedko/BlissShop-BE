@@ -1,18 +1,15 @@
 ﻿using AutoMapper;
 using BlissShop.Abstraction.Users;
 using BlissShop.Common.Configs;
-using BlissShop.Common.DTO.Settings;
 using BlissShop.Common.DTO.User;
 using BlissShop.Common.Exceptions;
 using BlissShop.Common.Extentions;
 using BlissShop.Common.Requests;
 using BlissShop.Common.Responses;
-using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Identity;
-using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
 
@@ -20,23 +17,24 @@ namespace BlissShop.BLL.Services.Users;
 
 public class UserService : IUserService
 {
-    private readonly UserAvatarConfig _userAvatarConfig;
     private readonly UserManager<User> _userManager;
+    private readonly UserAvatarConfig _userAvatarConfig;
     private readonly IWebHostEnvironment _env;
     private readonly ILogger<UserService> _logger;
     private readonly IMapper _mapper;
 
-    public UserService(UserAvatarConfig userAvatarConfig,
+    public UserService(
         UserManager<User> userManager,
+        UserAvatarConfig userAvatarConfig,
         IWebHostEnvironment env,
-        IMapper mapper,
-        ILogger<UserService> logger)
+        ILogger<UserService> logger,
+        IMapper mapper)
     {
-        _userAvatarConfig = userAvatarConfig;
         _userManager = userManager;
+        _userAvatarConfig = userAvatarConfig;
         _env = env;
-        _mapper = mapper;
         _logger = logger;
+        _mapper = mapper;
     }
 
     public async Task<AvatarResponse> UploadAvatarAsync(Guid userId, IFormFile avatar)
