@@ -8,6 +8,7 @@ using BlissShop.Entities;
 using BlissShop.FluentEmail.MessageBase;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.Extensions.Logging;
+using System.Web;
 
 namespace BlissShop.BLL.Services.Auth;
 
@@ -40,7 +41,7 @@ public class PasswordService : IPasswordService
 
         var token = await _userManager.GeneratePasswordResetTokenAsync(user);
 
-        var uri = string.Format(_callbackUrisConfig.ResetPasswordUri, user.Email, token);
+        var uri = string.Format(_callbackUrisConfig.ResetPasswordUri, user.Email, HttpUtility.UrlEncode(token));
 
         var emailSent = await _emailService.SendAsync( new ResetPasswordMessage { Recipient = request.Email, ResetPasswordUri = uri });
 
@@ -57,7 +58,7 @@ public class PasswordService : IPasswordService
         if (isSamePassword)
             throw new IncorrectParametersException("New password have to differ from the old one");
 
-        var result = await _userManager.ResetPasswordAsync(user, request.ResetToken, request.NewPassword);
+        var result = await _userManager.ResetPasswordAsync(user, HttpUtility.UrlDecode(request.ResetToken), request.NewPassword);
 
         if (!result.Succeeded)
         {
