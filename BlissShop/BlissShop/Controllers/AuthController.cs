@@ -71,6 +71,19 @@ namespace BlissShop.Controllers
         }
 
         /// <summary>
+        /// Resend confirmation email code.
+        /// </summary>
+        /// <param name="userId"></param>
+        [HttpPut("[action]")]
+        [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+        public async Task<IActionResult> ResendConfirmationCode(Guid userId)
+        {
+            await _emailConfirmationService.ResendConfirmationCodeAsync(userId);
+            return Ok();
+        }
+
+        /// <summary>
         /// Refresh token.
         /// </summary>
         /// <param name="dto"></param>
