@@ -7,6 +7,8 @@ using BlissShop.Entities;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using BlissShop.Abstraction.Auth;
+using BlissShop.FluentEmail.MessageBase;
+using BlissShop.Abstraction.FluentEmail;
 
 namespace BlissShop.BLL.Services.Auth;
 
@@ -15,17 +17,20 @@ public class EmailConfirmationService : IEmailConfirmationService
     private readonly IRepository<UserRegister> _userRegisterRepository;
     private readonly UserManager<User> _userManager;
     private readonly ITokenService _tokenService;
+    private readonly IEmailService _emailService;
     private readonly AuthConfig _authConfig;
 
     public EmailConfirmationService(
         IRepository<UserRegister> userRegisterRepository,
         UserManager<User> userManager,
         ITokenService tokenService,
+        IEmailService emailService,
         AuthConfig authConfig)
     {
         _userRegisterRepository = userRegisterRepository;
         _userManager = userManager;
         _tokenService = tokenService;
+        _emailService = emailService;
         _authConfig = authConfig;
     }
 
@@ -51,11 +56,13 @@ public class EmailConfirmationService : IEmailConfirmationService
 
     public async Task ResendConfirmationCodeAsync(Guid userId)
     {
-        var user = await _userRegisterRepository.FirstOrDefaultAsync(r => r.UserId == userId);
+        var user = await _userRegisterRepository.Include(x => x.User).FirstOrDefaultAsync(r => r.UserId == userId);
         if (user is null)
             throw new NotFoundException("User with this id does not exist");
 
         var result = await RegenerateEmailConfirmationCodeAsync(userId);
+
+        await _emailService.SendAsync(new ConfirmedEmailMessage { Recipient = user.User.Email!, Code = result });
     }
 
     public async Task<int> GenerateEmailCodeAsync(Guid userId)
