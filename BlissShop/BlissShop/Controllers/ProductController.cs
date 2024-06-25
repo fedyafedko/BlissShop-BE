@@ -158,7 +158,7 @@ namespace BlissShop.Controllers
         /// <param name="request"></param>
         /// <returns> This endpoint returns products.</returns>
         [HttpGet("[action]")]
-        [ProducesResponseType(typeof(List<ProductDTO>), StatusCodes.Status200OK)]
+        [ProducesResponseType(typeof(PageList<ProductDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
         public async Task<IActionResult> SearchProduct([FromQuery] SearchProductRequest request)
         {
