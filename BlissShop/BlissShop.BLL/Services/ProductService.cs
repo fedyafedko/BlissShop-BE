@@ -70,14 +70,6 @@ public class ProductService : IProductService
         if (!result)
             _logger.LogError("Product was not created");
 
-        var images = new UploadProductImageRequest
-        {
-            ProductId = product.Id,
-            Images = dto.Images
-        };
-
-        await UploadImagesAsync(sellerId, images);
-
         var productMessage = _mapper.Map<ProductDTO>(product);
         productMessage.ImagesPath = _env.ContentRootPath.GetImagePath(productMessage, _productImagesConfig);
 
