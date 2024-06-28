@@ -32,6 +32,8 @@ using BlissShop.Abstraction.Product;
 using Stripe;
 using BlissShop.Abstraction;
 using BlissShop.Extentions;
+using BlissShop.Hangfire.Extensions;
+using Hangfire;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -46,6 +48,7 @@ builder.Services.ConfigsAssembly(builder.Configuration, opt => opt
        .AddConfig<ProductImagesConfig>()
        .AddConfig<StripeConfig>()
        .AddConfig<CategoryAvatarConfig>()
+       .AddConfig<HangfireConfig>()
        .AddConfig<AuthConfig>());
 
 builder.Services.AddAutoMapper(typeof(AuthProfile));
@@ -79,6 +82,9 @@ builder.Services.AddScoped<IAddressService, AddressService>();
 builder.Services.AddScoped<ISettingService, SettingService>();
 builder.Services.AddScoped<IRatingService, RatingService>();
 builder.Services.AddScoped<ICategoryService, CategoryService>();
+
+// Hangfire
+builder.Services.AddHangfire(builder.Configuration);
 
 // Identity
 builder.Services.AddIdentity<User, IdentityRole<Guid>>()
@@ -167,6 +173,7 @@ builder.Services.AddCors(options => options
 var app = builder.Build();
 
 await app.ApplySeedingAsync();
+app.SetupHangfire();
 
 // Configure the HTTP request pipeline.
 if (app.Environment.IsDevelopment())
@@ -182,6 +189,7 @@ app.UseStaticFiles(new StaticFileOptions
 });
 
 app.MigrateDatabase();
+app.UseHangfireDashboard("/hangfire");
 
 app.UseHttpsRedirection();
 app.UseCors(

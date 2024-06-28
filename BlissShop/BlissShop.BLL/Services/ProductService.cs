@@ -237,7 +237,6 @@ public class ProductService : IProductService
             .Where(x => x.ShopId == shopId)
             .ToListAsync();
 
-        //ToDo: Send messages to followers with settings
         var emails = followers
             .Where(x => x.User.Setting.IsEmailNotification)
             .Select(x => x.User.Email)
@@ -285,5 +284,20 @@ public class ProductService : IProductService
         var result = searchProducts.Pagination(request.Page, request.PageSize);
 
         return result;
+    }
+
+    public async Task AddTotalRatingForProductAsync()
+    {
+        var products = await _productRepository
+            .Include(x => x.Ratings)
+            .ToListAsync();
+
+        foreach (var product in products)
+        {
+            if (product.Ratings.Count == 0)
+                continue;
+            product.TotalRating = product.Ratings.Sum(x => x.Rate) / product.Ratings.Count();
+            await _productRepository.UpdateAsync(product);
+        }
     }
 }

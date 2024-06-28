@@ -51,6 +51,8 @@ public class RatingService : IRatingService
             .FirstOrDefaultAsync(x => x.Id == productId)
             ?? throw new NotFoundException("Product not found");
 
+        
+
         return _mapper.Map<List<RatingDTO>>(product.Ratings);
     }
 
