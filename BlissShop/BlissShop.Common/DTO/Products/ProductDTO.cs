@@ -11,4 +11,5 @@ public class ProductDTO
     public List<string> Tags { get; set; } = null!;
     public int Quantity { get; set; }
     public List<string> ImagesPath { get; set; } = null!;
+    public double TotalRating { get; set; }
 }

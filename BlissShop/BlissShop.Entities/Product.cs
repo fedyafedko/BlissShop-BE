@@ -14,6 +14,7 @@ public class Product : EntityBase
     public string Description { get; set; } = string.Empty;
     public string Tags { get; set; } = string.Empty;
     public int Quantity { get; set; }
+    public double TotalRating { get; set; } = 0;
 
     public Shop Shop { get; set; } = null!;
     public Category Category { get; set; } = null!;

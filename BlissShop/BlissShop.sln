@@ -19,7 +19,9 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlissShop.Seeding", "BlissS
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlissShop.FluentEmail", "BlissShop.FluentEmail\BlissShop.FluentEmail.csproj", "{00CF4D05-548C-447F-9D1A-2258E7562B99}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlissShop.Validation", "BlissShop.Validation\BlissShop.Validation.csproj", "{D64E8BED-B5B6-45A9-9C7C-D0DF5D40DCEB}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "BlissShop.Validation", "BlissShop.Validation\BlissShop.Validation.csproj", "{D64E8BED-B5B6-45A9-9C7C-D0DF5D40DCEB}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "BlissShop.Hangfire", "BlissShop.Hangfire\BlissShop.Hangfire.csproj", "{B3952967-80A1-4F8F-80E4-3C7FC35433D7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -63,6 +65,10 @@ Global
 		{D64E8BED-B5B6-45A9-9C7C-D0DF5D40DCEB}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{D64E8BED-B5B6-45A9-9C7C-D0DF5D40DCEB}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{D64E8BED-B5B6-45A9-9C7C-D0DF5D40DCEB}.Release|Any CPU.Build.0 = Release|Any CPU
+		{B3952967-80A1-4F8F-80E4-3C7FC35433D7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{B3952967-80A1-4F8F-80E4-3C7FC35433D7}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{B3952967-80A1-4F8F-80E4-3C7FC35433D7}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{B3952967-80A1-4F8F-80E4-3C7FC35433D7}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
