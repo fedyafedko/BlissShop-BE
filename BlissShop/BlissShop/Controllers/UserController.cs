@@ -42,10 +42,10 @@ public class UserController : ControllerBase
     [HttpDelete("[action]")]
     [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status204NoContent)]
     [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
-    public IActionResult DeleteAvatar()
+    public async Task<IActionResult> DeleteAvatar()
     {
         var userId = HttpContext.GetUserId();
-        var result = _userService.DeleteAvatarAsync(userId);
+        var result = await _userService.DeleteAvatarAsync(userId);
         return result ? NoContent() : NotFound();
     }
 

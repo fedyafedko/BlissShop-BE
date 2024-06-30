@@ -78,24 +78,26 @@ public class UserService : IUserService
 
         return result;
     }
-    public bool DeleteAvatarAsync(Guid userId)
+    public async Task<bool> DeleteAvatarAsync(Guid userId)
     {
+        var user = await _userManager.FindByIdAsync(userId.ToString())
+            ?? throw new NotFoundException("User not found");
+
         var wwwPath = _env.ContentRootPath;
-        var path = Path.Combine(wwwPath, _userAvatarConfig.Folder, userId.ToString());
+        var path = Path.Combine(wwwPath, _userAvatarConfig.Folder);
 
         var file = Directory.GetFiles(path).FirstOrDefault(x => x.Contains(userId.ToString()));
 
-        if (!Directory.Exists(path))
+        if (string.IsNullOrEmpty(file))
             throw new NotFoundException("File not found");
 
-        var avatar = Directory.GetFiles(path).FirstOrDefault();
+        File.Delete(file);
 
-        if (string.IsNullOrEmpty(avatar))
-            throw new NotFoundException("File not found");
+        user.AvatarName = string.Empty;
 
-        File.Delete(avatar);
+        var result = await _userManager.UpdateAsync(user);
 
-        return true;
+        return result.Succeeded;
     }
 
     public async Task<UserDTO> Me(Guid userId)
@@ -110,8 +112,12 @@ public class UserService : IUserService
         var role = await _userManager.GetRolesAsync(entity);
 
         var user = _mapper.Map<UserDTO>(entity);
-        if (!entity.AvatarName.IsNullOrEmpty())
+
+        if (!entity.AvatarName.IsNullOrEmpty() && !file.IsNullOrEmpty())
             user.UrlAvatar = string.Format(_userAvatarConfig.Path, file);
+        else 
+            user.UrlAvatar = string.Empty;
+
         user.Role = role.FirstOrDefault()!;
 
         return user;

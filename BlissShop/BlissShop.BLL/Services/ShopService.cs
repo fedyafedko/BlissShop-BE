@@ -189,14 +189,18 @@ public class ShopService : IShopService
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var wwwPath = _env.ContentRootPath;
-        var path = Path.Combine(wwwPath, _shopAvatarConfig.Folder, request.ShopId.ToString(), request.Avatar);
+        var path = Path.Combine(wwwPath, _shopAvatarConfig.Folder, request.ShopId.ToString());
+        var file = Directory.GetFiles(path).FirstOrDefault(x => x.Contains(request.ShopId.ToString()));
 
-        if (!File.Exists(path))
+        if (!File.Exists(file))
             throw new NotFoundException("File not found");
 
-        await Task.Run(() => File.Delete(path));
+        File.Delete(file);
 
-        return true;
+        shop.AvatarName = string.Empty;
+        var result = await _shopRepository.UpdateAsync(shop);
+
+        return result;
     }
 
     public async Task<bool> ApprovedShopAsync(Guid shopId, bool isAproved)
