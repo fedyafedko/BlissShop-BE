@@ -10,6 +10,7 @@ using BlissShop.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
+using Microsoft.IdentityModel.Tokens;
 
 namespace BlissShop.BLL.Services;
 
@@ -132,15 +133,21 @@ public class CategoryService : ICategoryService
         if (!File.Exists(path))
             throw new NotFoundException("File not found");
 
-        await Task.Run(() => File.Delete(path));
+        File.Delete(path);
 
-        return true;
+        category.ImageName = string.Empty;
+        var result = await _categoryRepository.UpdateAsync(category);
+
+        return result;
     }
 
     private async Task<string> GetImagePath(Guid categoryId)
     {
         var category = await _categoryRepository.FirstOrDefaultAsync(x => x.Id == categoryId)
             ?? throw new NotFoundException($"Shop not found with such id: {categoryId}");
+
+        if (category.ImageName.IsNullOrEmpty())
+            return string.Empty;
 
         return string.Format(_categoryAvatarConfig.Path, category.Id, category.ImageName);
     }
