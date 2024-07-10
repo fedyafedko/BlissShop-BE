@@ -172,6 +172,7 @@ public class ProductCartService : IProductCartService
         var productCart = await _productCartRepository
             .Include(x => x.ProductCartItems)
             .ThenInclude(x => x.Product)
+            .ThenInclude(x => x.Shop)
             .FirstOrDefaultAsync(x => x.UserId == userId)
             ?? throw new Exception("Product cart not found");
 

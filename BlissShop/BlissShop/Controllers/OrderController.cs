@@ -76,6 +76,21 @@ public class OrderController : ControllerBase
     }
 
     /// <summary>
+    /// Getting orders for seller.
+    /// </summary>
+    /// <returns> This endpoint returns orders.</returns>
+    [HttpGet("[action]")]
+    [Authorize(Roles = "Seller")]
+    [ProducesResponseType(typeof(List<OrderDTO>), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> GetOrdersForSeller()
+    {
+        var sellerId = HttpContext.GetUserId();
+        var result = await _orderService.GetOrdersForSellerAsync(sellerId);
+        return Ok(result);
+    }
+
+    /// <summary>
     /// Get order by id.
     /// </summary>
     /// <param name="orderId"></param>
@@ -98,11 +113,26 @@ public class OrderController : ControllerBase
     [HttpPost("[action]")]
     [Authorize]
     [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
-    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
     public async Task<IActionResult> Refund(Guid orderId)
     {
         var userId = HttpContext.GetUserId();
         var result = await _orderService.Refund(userId, orderId);
-        return Ok(result);
+        return result ? Ok() : BadRequest();  
+    }
+
+    /// <summary>
+    /// Update order status.
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns> This endpoint returns a result.</returns>
+    [HttpPut("[action]")]
+    [Authorize(Roles = "Seller")]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
+    public async Task<IActionResult> ApprovedOrder(Guid orderId)
+    {
+        var result = await _orderService.ApprovedOrderAsync(orderId);
+        return result ? Ok() : BadRequest();
     }
 }

@@ -10,7 +10,7 @@ public static class ImageExtension
         var filePath = Path.Combine(
                 rootPath,
                 config.Folder,
-                product.ShopId.ToString(),
+                product.Shop.Id.ToString(),
                 product.Id.ToString());
 
         if (!Directory.Exists(filePath))
@@ -22,7 +22,7 @@ public static class ImageExtension
 
         foreach (var file in files)
         {
-            images.Add(string.Format(config.Path, product.ShopId, product.Id, file));
+            images.Add(string.Format(config.Path, product.Shop.Id, product.Id, file));
         }
 
         return images;
