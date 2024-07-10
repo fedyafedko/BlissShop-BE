@@ -1,4 +1,5 @@
-﻿using System.ComponentModel.DataAnnotations.Schema;
+﻿using BlissShop.Entities.Enums;
+using System.ComponentModel.DataAnnotations.Schema;
 
 
 namespace BlissShop.Entities;
@@ -15,6 +16,7 @@ public class Order : EntityBase
     public bool IsPaid { get; set; }
     public DateTime CreateAt { get; set; }
     public string ChargeId { get; set; } = string.Empty;
+    public StatusOrder Status { get; set; } = StatusOrder.Pending;
 
     public Address Address { get; set; } = null!;
     public User User { get; set; } = null!;

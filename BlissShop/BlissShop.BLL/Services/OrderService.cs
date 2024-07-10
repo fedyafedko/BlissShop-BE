@@ -8,8 +8,8 @@ using BlissShop.Common.Exceptions;
 using BlissShop.Common.Requests;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
+using BlissShop.Entities.Enums;
 using BlissShop.FluentEmail.MessageBase;
-using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
@@ -117,12 +117,39 @@ public class OrderService : IOrderService
         return _mapper.Map<OrderDTO>(order);
     }
 
+    public async Task<bool> ApprovedOrderAsync(Guid orderId)
+    {
+        var order = await _orderRepository
+            .FirstOrDefaultAsync(x => x.Id == orderId)
+            ?? throw new NotFoundException("Order not found");
+
+        if (order.Status != StatusOrder.Pending)
+            throw new RestrictedAccessException("Order has already been approved");
+
+        order.Status = StatusOrder.Processing;
+
+        return await _orderRepository.UpdateAsync(order);
+    }
+
     public async Task<List<OrderDTO>> GetOrdersForUserAsync(Guid userId)
     {
         var orders = await _orderRepository
             .Include(x => x.Product)
             .Include(x => x.Address)
             .Where(x => x.BuyerId == userId)
+            .Select(x => x)
+            .ToListAsync();
+
+        return _mapper.Map<List<OrderDTO>>(orders);
+    }
+
+    public async Task<List<OrderDTO>> GetOrdersForSellerAsync(Guid sellerId)
+    {
+        var orders = await _orderRepository
+            .Include(x => x.Product)
+            .ThenInclude(x => x.Shop)
+            .Include(x => x.Address)
+            .Where(x => x.Product.Shop.SellerId == sellerId)
             .Select(x => x)
             .ToListAsync();
 
@@ -199,19 +226,27 @@ public class OrderService : IOrderService
         return result;
     }
 
-    public async Task<Refund> Refund(Guid userId, Guid orderId)
+    public async Task<bool> Refund(Guid userId, Guid orderId)
     {
         var order = await _orderRepository
             .FirstOrDefaultAsync(x => x.Id == orderId)
             ?? throw new NotFoundException("Order not found");
 
-        if (userId != order.Id)
+        if (userId != order.BuyerId)
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
-        var options = new RefundCreateOptions { Charge = order.ChargeId};
+        var options = new RefundCreateOptions { Charge = order.ChargeId };
         var service = new RefundService();
         var result = await service.CreateAsync(options);
 
-        return result;
+        if (result.Status == "succeeded")
+        {
+            order.Status = StatusOrder.Refund;
+            await _orderRepository.UpdateAsync(order);
+
+            return true;
+        }
+            
+        return false;
     }
 }

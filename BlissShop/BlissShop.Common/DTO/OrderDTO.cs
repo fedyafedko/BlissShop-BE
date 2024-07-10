@@ -12,4 +12,6 @@ public class OrderDTO
     public int Quantity { get; set; }
     public bool IsPaid { get; set; }
     public DateTime CreateAt { get; set; }
+    public string ChargeId { get; set; } = string.Empty;
+    public string Status { get; set; } = string.Empty;
 }

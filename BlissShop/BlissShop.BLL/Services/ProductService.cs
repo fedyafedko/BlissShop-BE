@@ -63,7 +63,7 @@ public class ProductService : IProductService
             throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
 
         var product = _mapper.Map<Product>(dto);
-        product.ShopId = shop.Id;
+        product.Shop = shop;
 
         var result = await _productRepository.InsertAsync(product);
 
@@ -99,6 +99,7 @@ public class ProductService : IProductService
     public async Task<ProductDTO> GetProductByIdAsync(Guid id)
     {
         var product = await _productRepository
+            .Include(x => x.Shop)
             .FirstOrDefaultAsync(x => x.Id == id)
             ?? throw new NotFoundException($"Product not found with such id: {id}");
 
@@ -111,7 +112,9 @@ public class ProductService : IProductService
 
     public async Task<List<ProductDTO>> GetProductsForShopAsync(Guid shopId)
     {
-        var query = _productRepository.Where(x => x.ShopId == shopId);
+        var query = _productRepository
+            .Include(x => x.Shop)
+            .Where(x => x.ShopId == shopId);
         var products = await query.ToListAsync();
 
         var result = _mapper.Map<List<ProductDTO>>(products);
@@ -265,12 +268,12 @@ public class ProductService : IProductService
 
     public async Task<PageList<ProductDTO>> SearchProductAsync(SearchProductRequest request)
     {
-        var products = await _productRepository.ToListAsync();
+        var products = await _productRepository.Include(x => x.Shop).ToListAsync();
 
         if (!string.IsNullOrEmpty(request.Search))
         {
             products = products
-                .Where(x => x.Name.Contains(request.Search) || x.Tags.Contains(request.Search))
+                .Where(x => x.Name.ToLower().Contains(request.Search.ToLower()) || x.Tags.ToLower().Contains(request.Search.ToLower()))
                 .ToList();
         }
 

@@ -1,9 +1,11 @@
-﻿namespace BlissShop.Common.DTO.Products;
+﻿using BlissShop.Common.DTO.Shop;
+
+namespace BlissShop.Common.DTO.Products;
 
 public class ProductDTO
 {
     public Guid Id { get; set; }
-    public Guid ShopId { get; set; }
+    public ShopDTO Shop { get; set; } = null!;
     public Guid CategoryId { get; set; }
     public string Name { get; set; } = string.Empty;
     public decimal Price { get; set; }
