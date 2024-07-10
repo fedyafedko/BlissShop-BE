@@ -92,7 +92,7 @@ builder.Services.AddIdentity<User, IdentityRole<Guid>>()
     .AddEntityFrameworkStores<ApplicationDbContext>()
     .AddTokenProvider<DataProtectorTokenProvider<User>>(TokenOptions.DefaultProvider);
 
-// Payment
+// Stripe
 StripeConfiguration.ApiKey = builder.Configuration.GetValue<string>("StripeConfig:SecretKey");
 
 builder.Services.AddRouting(options => options.LowercaseUrls = true);
