@@ -138,6 +138,13 @@ public class OrderService : IOrderService
         if (session == null)
             throw new NotFoundException("Session not found");
 
+        var paymentIntentId = session.PaymentIntentId;
+
+        var paymentIntentService = new PaymentIntentService();
+        var paymentIntent = await paymentIntentService.GetAsync(paymentIntentId);
+
+        var charge = paymentIntent.LatestChargeId;
+
         var user = await _userManager.FindByEmailAsync(session.CustomerEmail)
             ?? throw new NotFoundException("User not found");
 
@@ -161,7 +168,8 @@ public class OrderService : IOrderService
                 AddressId = addressId,
                 Quantity = item.Quantity,
                 IsPaid = true,
-                CreateAt = DateTime.Now
+                CreateAt = DateTime.Now,
+                ChargeId = charge
             });
         }
 
@@ -187,6 +195,22 @@ public class OrderService : IOrderService
             Products = products,
             TotalPrice = productCart.TotalPrice
         });
+
+        return result;
+    }
+
+    public async Task<Refund> Refund(Guid userId, Guid orderId)
+    {
+        var order = await _orderRepository
+            .FirstOrDefaultAsync(x => x.Id == orderId)
+            ?? throw new NotFoundException("Order not found");
+
+        if (userId != order.Id)
+            throw new RestrictedAccessException("You are not the owner and do not have permission to perform this action.");
+
+        var options = new RefundCreateOptions { Charge = order.ChargeId};
+        var service = new RefundService();
+        var result = await service.CreateAsync(options);
 
         return result;
     }

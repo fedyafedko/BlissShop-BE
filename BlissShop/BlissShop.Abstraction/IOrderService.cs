@@ -10,4 +10,5 @@ public interface IOrderService
     Task<bool> HandleWebhook(Event stripeEvent);
     Task<List<OrderDTO>> GetOrdersForUserAsync(Guid userId);
     Task<OrderDTO> GetOrderAsync(Guid orderId);
+    Task<Refund> Refund(Guid userId, Guid orderId)
 }

@@ -48,10 +48,9 @@ public class RatingService : IRatingService
     {
         var product = await _productRepository
             .Include(x => x.Ratings)
+            .ThenInclude(x => x.User)
             .FirstOrDefaultAsync(x => x.Id == productId)
             ?? throw new NotFoundException("Product not found");
-
-        
 
         return _mapper.Map<List<RatingDTO>>(product.Ratings);
     }
@@ -62,6 +61,7 @@ public class RatingService : IRatingService
             ?? throw new NotFoundException("User not found");
 
         var ratings = await _ratingRepository
+            .Include(x => x.User)
             .Where(x => x.UserId == user.Id)
             .ToListAsync();
 

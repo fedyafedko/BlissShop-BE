@@ -14,7 +14,8 @@ public class Order : EntityBase
     public int Quantity { get; set; }
     public bool IsPaid { get; set; }
     public DateTime CreateAt { get; set; }
-    
+    public string ChargeId { get; set; } = string.Empty;
+
     public Address Address { get; set; } = null!;
     public User User { get; set; } = null!;
     public Product Product { get; set; } = null!;

@@ -5,7 +5,6 @@ using BlissShop.Abstraction;
 using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests;
 using Microsoft.AspNetCore.Authorization;
-using BlissShop.Common.DTO.Auth;
 using BlissShop.Common.DTO;
 
 namespace BlissShop.Controllers;
@@ -88,6 +87,22 @@ public class OrderController : ControllerBase
     public async Task<IActionResult> GetOrder(Guid orderId)
     {
         var result = await _orderService.GetOrderAsync(orderId);
+        return Ok(result);
+    }
+
+    /// <summary>
+    /// Refund order.
+    /// </summary>
+    /// <param name="orderId"></param>
+    /// <returns> This endpoint returns a result.</returns>
+    [HttpPost("[action]")]
+    [Authorize]
+    [ProducesResponseType(typeof(object), StatusCodes.Status200OK)]
+    [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
+    public async Task<IActionResult> Refund(Guid orderId)
+    {
+        var userId = HttpContext.GetUserId();
+        var result = await _orderService.Refund(userId, orderId);
         return Ok(result);
     }
 }

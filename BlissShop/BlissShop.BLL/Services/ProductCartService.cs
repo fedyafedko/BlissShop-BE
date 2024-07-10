@@ -95,18 +95,36 @@ public class ProductCartService : IProductCartService
         var productCart = _productCartRepository.FirstOrDefault(x => x.UserId == userId)
             ?? throw new Exception("Product cart not found");
 
-        var productItem = _productCartItemsRepository.Include(x => x.Product).FirstOrDefault(x => x.ProductId == productId && x.ProductCartId == productCart.Id)
+        var productItem = _productCartItemsRepository
+            .Include(x => x.Product)
+            .FirstOrDefault(x => x.ProductId == productId && x.ProductCartId == productCart.Id)
             ?? throw new Exception("Product not found in cart");
 
-        var result = await _productCartItemsRepository.DeleteAsync(productItem);
+        bool result = false;
+
+        foreach (var item in productCart.ProductCartItems.ToList())
+        {
+            if (item.ProductId == productId)
+            {
+                item.Quantity -= 1;
+                productCart.TotalPrice -= (double)productItem.Product.Price;
+                if (item.Quantity == 0)
+                {
+                    await _productCartItemsRepository.DeleteAsync(item);
+                    productCart.TotalPrice = 0;
+                    result = await _productCartRepository.UpdateAsync(productCart);
+                }
+                else
+                {
+                    result = await _productCartItemsRepository.UpdateAsync(item);
+                }
+            }
+        }
 
         if(!result) 
         {
             _logger.LogError("Failed to remove product from cart");
         }
-
-        productCart.TotalPrice -= (double)productItem.Product.Price * productItem.Quantity;
-        await _productCartRepository.UpdateAsync(productCart);
 
         return result;
     }
