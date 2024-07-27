@@ -10,6 +10,7 @@ using BlissShop.Common.Requests.ProductImage;
 using BlissShop.Common.Responses;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
+using BlissShop.Entities.Enums;
 using BlissShop.FluentEmail.MessageBase;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.EntityFrameworkCore;
@@ -110,24 +111,28 @@ public class ProductService : IProductService
         return result;
     }
 
-    public async Task<List<ProductDTO>> GetProductsForShopAsync(Guid shopId)
+    public async Task<PageList<ProductDTO>> GetProductsForShopAsync(Guid shopId, SearchProductRequest request, Sorting? sorting)
     {
         var query = _productRepository
             .Include(x => x.Shop)
             .Where(x => x.ShopId == shopId);
         var products = await query.ToListAsync();
 
-        var result = _mapper.Map<List<ProductDTO>>(products);
+        var productsShop = _mapper.Map<List<ProductDTO>>(products);
 
-        foreach (var product in result)
+        var sortingProducts = productsShop.SortingItems(sorting);
+
+        foreach (var product in sortingProducts)
         {
             product.ImagesPath = _env.ContentRootPath.GetImagePath(product, _productImagesConfig);
         }
 
+        var result = sortingProducts.Pagination(request.Page, request.PageSize);
+
         return result;
     }
 
-    public async Task<List<ProductDTO>> GetProductForCategoryAsync(Guid categoryId)
+    public async Task<PageList<ProductDTO>> GetProductForCategoryAsync(Guid categoryId, SearchProductRequest request, Sorting? sorting)
     {
         var category = await _categoryRepository.FirstOrDefaultAsync(x => x.Id == categoryId)
             ?? throw new NotFoundException($"Category not found with such id: {categoryId}");
@@ -137,12 +142,16 @@ public class ProductService : IProductService
             .Where(x => x.CategoryId == categoryId)
             .ToListAsync();
 
-        var result = _mapper.Map<List<ProductDTO>>(products);
+        var productForCategory = _mapper.Map<List<ProductDTO>>(products);
 
-        foreach (var product in result)
+        var sortingProducts = productForCategory.SortingItems(sorting);
+
+        foreach (var product in sortingProducts)
         {
             product.ImagesPath = _env.ContentRootPath.GetImagePath(product, _productImagesConfig);
         }
+
+        var result = sortingProducts.Pagination(request.Page, request.PageSize);
 
         return result;
     }
@@ -266,7 +275,7 @@ public class ProductService : IProductService
         return result;
     }
 
-    public async Task<PageList<ProductDTO>> SearchProductAsync(SearchProductRequest request)
+    public async Task<PageList<ProductDTO>> SearchProductAsync(SearchProductRequest request, Sorting? sorting)
     {
         var products = await _productRepository.Include(x => x.Shop).ToListAsync();
 
@@ -279,12 +288,14 @@ public class ProductService : IProductService
 
         var searchProducts = _mapper.Map<List<ProductDTO>>(products);
 
-        foreach (var product in searchProducts)
+        var sortingProducts = searchProducts.SortingItems(sorting);
+
+        foreach (var product in sortingProducts)
         {
             product.ImagesPath = _env.ContentRootPath.GetImagePath(product, _productImagesConfig);
         }
 
-        var result = searchProducts.Pagination(request.Page, request.PageSize);
+        var result = sortingProducts.Pagination(request.Page, request.PageSize);
 
         return result;
     }

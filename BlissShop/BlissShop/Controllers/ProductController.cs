@@ -4,6 +4,7 @@ using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests;
 using BlissShop.Common.Requests.ProductImage;
 using BlissShop.Common.Responses;
+using BlissShop.Entities.Enums;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
@@ -96,9 +97,9 @@ namespace BlissShop.Controllers
         [HttpGet("[action]")]
         [ProducesResponseType(typeof(List<ProductDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetProductsForShop(Guid shopId)
+        public async Task<IActionResult> GetProductsForShop(Guid shopId, [FromQuery] SearchProductRequest request, Sorting? sorting)
         {
-            var result = await _productService.GetProductsForShopAsync(shopId);
+            var result = await _productService.GetProductsForShopAsync(shopId, request, sorting);
 
             return Ok(result);
         }
@@ -111,9 +112,9 @@ namespace BlissShop.Controllers
         [HttpGet("[action]")]
         [ProducesResponseType(typeof(List<ProductDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> GetProductsForCategory(Guid categoryId)
+        public async Task<IActionResult> GetProductsForCategory(Guid categoryId, [FromQuery] SearchProductRequest request, Sorting? sorting)
         {
-            var result = await _productService.GetProductForCategoryAsync(categoryId);
+            var result = await _productService.GetProductForCategoryAsync(categoryId, request, sorting);
 
             return Ok(result);
         }
@@ -160,9 +161,9 @@ namespace BlissShop.Controllers
         [HttpGet("[action]")]
         [ProducesResponseType(typeof(PageList<ProductDTO>), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> SearchProduct([FromQuery] SearchProductRequest request)
+        public async Task<IActionResult> SearchProduct([FromQuery] SearchProductRequest request, Sorting? sorting)
         {
-            var result = await _productService.SearchProductAsync(request);
+            var result = await _productService.SearchProductAsync(request, sorting);
 
             return Ok(result);
         }
