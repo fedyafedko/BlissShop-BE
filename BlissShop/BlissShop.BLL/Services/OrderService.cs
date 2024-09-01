@@ -5,11 +5,13 @@ using BlissShop.Common.Configs;
 using BlissShop.Common.DTO;
 using BlissShop.Common.DTO.Products;
 using BlissShop.Common.Exceptions;
+using BlissShop.Common.Extensions;
 using BlissShop.Common.Requests;
 using BlissShop.DAL.Repositories.Interfaces;
 using BlissShop.Entities;
 using BlissShop.Entities.Enums;
 using BlissShop.FluentEmail.MessageBase;
+using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.EntityFrameworkCore;
 using Stripe;
@@ -27,6 +29,8 @@ public class OrderService : IOrderService
     private readonly IEmailService _emailService;
     private readonly StripeConfig _stripeConfig;
     private readonly IMapper _mapper;
+    private readonly IWebHostEnvironment _env;
+    private readonly ProductImagesConfig _productImagesConfig;
 
     public OrderService(
         IRepository<ProductCartItem> productCartItemRepository,
@@ -36,7 +40,9 @@ public class OrderService : IOrderService
         UserManager<User> userManager,
         IEmailService emailService,
         StripeConfig stripeConfig,
-        IMapper mapper)
+        IMapper mapper,
+        IWebHostEnvironment env,
+        ProductImagesConfig productImagesConfig)
     {
         _productCartItemRepository = productCartItemRepository;
         _productCartRepository = productCartRepository;
@@ -46,6 +52,8 @@ public class OrderService : IOrderService
         _emailService = emailService;
         _stripeConfig = stripeConfig;
         _mapper = mapper;
+        _env = env;
+        _productImagesConfig = productImagesConfig;
     }
 
     public async Task<string> Checkout(Guid userId, PaymentRequest request)
@@ -87,7 +95,7 @@ public class OrderService : IOrderService
             PaymentMethodTypes = new List<string>
             {
                 _stripeConfig.PaymentMethodTypes
-            },  
+            },
             Metadata = new Dictionary<string, string>
             {
                 { "cartId", request.CartId.ToString() },
@@ -110,11 +118,15 @@ public class OrderService : IOrderService
     {
         var order = await _orderRepository
             .Include(x => x.Product)
+            .ThenInclude(x => x.Shop)
             .Include(x => x.Address)
             .FirstOrDefaultAsync(x => x.Id == orderId)
             ?? throw new NotFoundException("Order not found");
 
-        return _mapper.Map<OrderDTO>(order);
+        var result = _mapper.Map<OrderDTO>(order);
+        result.Product.ImagesPath = _env.ContentRootPath.GetImagePath(result.Product, _productImagesConfig);
+
+        return result;
     }
 
     public async Task<bool> ApprovedOrderAsync(Guid orderId)
@@ -135,12 +147,19 @@ public class OrderService : IOrderService
     {
         var orders = await _orderRepository
             .Include(x => x.Product)
+            .ThenInclude(x => x.Shop)
             .Include(x => x.Address)
             .Where(x => x.BuyerId == userId)
             .Select(x => x)
             .ToListAsync();
 
-        return _mapper.Map<List<OrderDTO>>(orders);
+        var result = _mapper.Map<List<OrderDTO>>(orders);
+        foreach (var item in result)
+        {
+            item.Product.ImagesPath = _env.ContentRootPath.GetImagePath(item.Product, _productImagesConfig);
+        }
+
+        return result;
     }
 
     public async Task<List<OrderDTO>> GetOrdersForSellerAsync(Guid sellerId)
@@ -153,7 +172,13 @@ public class OrderService : IOrderService
             .Select(x => x)
             .ToListAsync();
 
-        return _mapper.Map<List<OrderDTO>>(orders);
+        var result = _mapper.Map<List<OrderDTO>>(orders);
+        foreach (var item in result)
+        {
+            item.Product.ImagesPath = _env.ContentRootPath.GetImagePath(item.Product, _productImagesConfig);
+        }
+
+        return result;
     }
 
     public async Task<bool> HandleWebhook(Event stripeEvent)
@@ -185,7 +210,7 @@ public class OrderService : IOrderService
             ?? throw new NotFoundException("Product not found");
 
         var order = new List<Order>();
-        
+
         foreach (var item in productCart.ProductCartItems)
         {
             order.Add(new Order
@@ -246,7 +271,7 @@ public class OrderService : IOrderService
 
             return true;
         }
-            
+
         return false;
     }
 }
