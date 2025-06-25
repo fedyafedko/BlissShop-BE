@@ -1,6 +1,7 @@
 ﻿using BlissShop.Abstraction.Shop;
 using BlissShop.Common.DTO.Shop;
 using BlissShop.Common.Extensions;
+using BlissShop.Common.Requests;
 using BlissShop.Common.Requests.ShopAvatar;
 using BlissShop.Common.Responses;
 using Microsoft.AspNetCore.Authorization;
@@ -127,7 +128,7 @@ namespace BlissShop.Controllers
         [Authorize(Roles = "Seller")]
         [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status404NotFound)]
-        public async Task<IActionResult> DeleteAvatar(DeleteShopAvatarRequest request)
+        public async Task<IActionResult> DeleteAvatar([FromQuery] DeleteShopAvatarRequest request)
         {
             var userId = HttpContext.GetUserId();
             var result = await _shopService.DeleteAvatarAsync(userId, request);
@@ -145,9 +146,9 @@ namespace BlissShop.Controllers
         [Authorize(Roles = "Admin")]
         [ProducesResponseType(typeof(StatusCodes), StatusCodes.Status200OK)]
         [ProducesResponseType(typeof(object), StatusCodes.Status400BadRequest)]
-        public async Task<IActionResult> IsApprovedShop(Guid shopId, bool isAproved)
+        public async Task<IActionResult> IsApprovedShop(ApprovedShopRequest request)
         {
-            var result = await _shopService.ApprovedShopAsync(shopId, isAproved);
+            var result = await _shopService.ApprovedShopAsync(request.ShopId, request.IsApproved);
 
             return result ? Ok() : BadRequest();
         }

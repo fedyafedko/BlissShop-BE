@@ -239,7 +239,7 @@ public class OrderService : IOrderService
 
     private async Task<bool> SendOrderMessageAsync(User user, ProductCart productCart)
     {
-        var products = productCart.ProductCartItems.Select(x => _mapper.Map<ProductDTO>(x.Product)).ToList();
+                                                                                                                                                                                                                                                                                                                                                  var products = productCart.ProductCartItems.Select(x => _mapper.Map<ProductDTO>(x.Product)).ToList();
 
         var result = await _emailService.SendAsync(new OrderMessage
         {

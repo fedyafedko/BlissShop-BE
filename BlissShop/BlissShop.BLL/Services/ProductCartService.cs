@@ -189,6 +189,7 @@ public class ProductCartService : IProductCartService
 
         var result = new ProductCartResponse
         {
+            Id = productCart.Id,
             Products = products,
             TotalPrice = (decimal)productCart.TotalPrice,
         };
