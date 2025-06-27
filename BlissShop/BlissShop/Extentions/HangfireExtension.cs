@@ -9,8 +9,10 @@ public static class HangfireExtension
 {
     public static void AddHangfire(this IServiceCollection services, ConfigurationManager configuration)
     {
-        services.AddHangfire(
-            cfg => cfg.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection")));
+        services.AddHangfire(cfg => cfg.UseSqlServerStorage(configuration.GetConnectionString("DefaultConnection"), new SqlServerStorageOptions
+        {
+            PrepareSchemaIfNecessary = true
+        }));
 
         JobStorage.Current = new SqlServerStorage(configuration.GetConnectionString("DefaultConnection"));
 

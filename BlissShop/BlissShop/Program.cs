@@ -172,14 +172,20 @@ builder.Services.AddCors(options => options
 
 var app = builder.Build();
 
+app.MigrateDatabase();
+
 await app.ApplySeedingAsync();
 app.SetupHangfire();
 
 // Configure the HTTP request pipeline.
-if (app.Environment.IsDevelopment())
+app.UseSwagger();
+app.UseSwaggerUI();
+
+var uploadsPath = Path.Combine(Directory.GetCurrentDirectory(), "Uploads");
+Console.WriteLine(uploadsPath);
+if (!Directory.Exists(uploadsPath))
 {
-    app.UseSwagger();
-    app.UseSwaggerUI();
+    Directory.CreateDirectory(uploadsPath);
 }
 
 app.UseStaticFiles(new StaticFileOptions
@@ -188,10 +194,8 @@ app.UseStaticFiles(new StaticFileOptions
     RequestPath = "/Uploads"
 });
 
-app.MigrateDatabase();
 app.UseHangfireDashboard("/hangfire");
 
-app.UseHttpsRedirection();
 app.UseCors(
     opt => opt.AllowAnyHeader().AllowAnyMethod().AllowAnyOrigin());
 

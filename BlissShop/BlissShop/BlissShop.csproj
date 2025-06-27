@@ -6,6 +6,8 @@
     <ImplicitUsings>enable</ImplicitUsings>
     <InvariantGlobalization>false</InvariantGlobalization>
 	  <PreserveCompilationContext>true</PreserveCompilationContext>
+	  <UserSecretsId>beb4a400-3613-4b67-b00e-94d6f6551f69</UserSecretsId>
+	  <DockerDefaultTargetOS>Linux</DockerDefaultTargetOS>
   </PropertyGroup>
 
   <ItemGroup>
@@ -25,6 +27,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
+    <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
     <PackageReference Include="Stripe.net" Version="44.5.0" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="6.4.0" />
   </ItemGroup>
@@ -35,10 +38,6 @@
     <ProjectReference Include="..\BlissShop.Hangfire\BlissShop.Hangfire.csproj" />
     <ProjectReference Include="..\BlissShop.Seeding\BlissShop.Seeding.csproj" />
     <ProjectReference Include="..\BlissShop.Validation\BlissShop.Validation.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <Folder Include="Uploads\Avatars\" />
   </ItemGroup>
 
 </Project>

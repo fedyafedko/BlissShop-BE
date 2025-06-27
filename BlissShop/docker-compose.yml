@@ -1,0 +1,28 @@
+services:
+  api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    ports:
+      - 8080:80
+    depends_on:
+      - db
+    restart: always
+  db:
+    image: mcr.microsoft.com/mssql/server:2022-latest
+    environment:
+      - ACCEPT_EULA=SA
+      - SA_PASSWORD=Fedko123!@#
+    ports:
+      - 5545:1433
+    volumes:
+      - sqlserver-data:/var/opt/mssql
+  stripe:
+    image: stripe/stripe-cli
+    depends_on:
+      - api
+    command: |
+          listen --api-key $STRIPE_SECRET_KEY --forward-to http://host.docker.internal:8080/api/order/webhook --skip-verify
+
+volumes:
+  sqlserver-data:

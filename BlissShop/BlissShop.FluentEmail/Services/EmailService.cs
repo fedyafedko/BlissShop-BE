@@ -21,7 +21,7 @@ public class EmailService : IEmailService
     public async Task<bool> SendAsync<T>(T message, string? from = null)
         where T : EmailMessageBase
     {
-        var path = $@"{Directory.GetCurrentDirectory()}{_emailConfig.MessagePath}\{message.TemplateName}.cshtml";
+        var path = $@"{Directory.GetCurrentDirectory()}{_emailConfig.MessagePath}/{message.TemplateName}.cshtml";
         var sendEmail = await _fluentEmail
                   .SetFrom(from ?? _emailConfig.DefaultFromEmail)
                   .To(message.Recipient ?? _emailConfig.DefaultFromEmail)
@@ -37,7 +37,7 @@ public class EmailService : IEmailService
     {
         foreach (var item in message)
         {
-            var path = $@"{Directory.GetCurrentDirectory()}{_emailConfig.MessagePath}\{item.TemplateName}.cshtml";
+            var path = $@"{Directory.GetCurrentDirectory()}{_emailConfig.MessagePath}/{item.TemplateName}.cshtml";
             var sendEmail = await _fluentEmailFactory
                  .Create()
                  .To(item.Recipient)

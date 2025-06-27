@@ -1,4 +1,4 @@
-@BlissShop_HostAddress = http://localhost:5095
+@BlissShop_HostAddress = http://localhost:8080
 
 GET {{BlissShop_HostAddress}}/weatherforecast/
 Accept: application/json
